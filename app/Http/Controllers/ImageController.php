@@ -33,6 +33,7 @@ class ImageController extends Controller
     public function index()
     {
         if(Auth::check()){
+
             return view('pages.images', [
                 'items' => $this->images->getAllImages(),
                 'sortColumn' => ['created_at','asc']
@@ -40,7 +41,15 @@ class ImageController extends Controller
         }
         return redirect('login');
     }
-
+  /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function test(){
+        $tags = Image::find(1)->tags()->get();
+        return $tags;
+    }
     /**
      * Show the form for creating a new resource.
      *

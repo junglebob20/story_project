@@ -49,15 +49,11 @@
                 <td>{{ $item->name }}</td>
                 <td>
                     <div class="tags-wrapper">
-                        <div class="tag-wrap">
-                            <span id="unclickable-label" class="aui-label">tag_name1</span>
-                        </div>
-                        <div class="tag-wrap">
-                            <span id="unclickable-label" class="aui-label">tag_name2</span>
-                        </div>
-                        <div class="tag-wrap">
-                            <span id="unclickable-label" class="aui-label">tag_name3</span>
-                        </div>
+                        @foreach($item->tags as $k=>$tag)
+                            <div class="tag-wrap">
+                                <span id="unclickable-label" class="aui-label">{{$tag->name}}</span>
+                            </div>
+                        @endforeach
                     </div>
                 </td>
                 <td class="col-action">

@@ -44,7 +44,13 @@
       <tr>
         <th scope="row">{{$item->id}}</th>
         <td>{{$item->username}}</td>
-        <td>{{$item->role}}</td>
+        @if($item->roles[0]->pivot->role_id=='1')
+          <td>{{$roles[0]->name}}</td>
+        @elseif($item->roles[0]->pivot->role_id=='2')
+          <td>{{$roles[1]->name}}</td>
+        @elseif($item->roles[0]->pivot->role_id=='3')
+          <td>{{$roles[2]->name}}</td>
+        @endif
         <td>{{$item->created_at}}</td>
         <td>{{$item->updated_at}}</td>
         <td class="col-action">
@@ -87,8 +93,9 @@
             <div class="form-group">
               <label for="role_input">Role</label>
               <select name="role" class="form-control" id="role_input">
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
+                @foreach($roles as $k=>$role)
+                  <option value="{{$role->id}}">{{$role->name}}</option>
+                @endforeach
               </select>
             </div>
             <input type="hidden" name="_token" value="{{ csrf_token() }}">

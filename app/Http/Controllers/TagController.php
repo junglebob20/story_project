@@ -101,7 +101,7 @@ class TagController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function test(){
-        $roles = Tag::find(0)->images()->get();
+        $roles = Tag::find(2)->images()->get();
         return $roles;
     }
     /**

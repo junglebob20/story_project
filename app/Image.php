@@ -14,7 +14,7 @@ class Image extends Model
     protected $fillable = [
         'name','path','ext'
     ];
-    public function images()
+    public function tags()
     {
         return $this->belongsToMany(Tag::Class, 'image_tags', 'image_id', 'tag_id');
     }

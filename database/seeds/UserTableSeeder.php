@@ -11,7 +11,6 @@ class UserTableSeeder extends Seeder{
         User::create(array(
             'username' => 'root',
             'password' => Hash::make('root'),
-            'role' => 'root',
             'remember_token' => '0'
         ));
     }

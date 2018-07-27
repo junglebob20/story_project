@@ -6,11 +6,11 @@ use App\Image;
 
 class ImageRepository
 {
-  protected $image;
+    protected $image;
 
 	public function __construct(Image $image)
 	{
-	    $this->images = $image;
+	    $this->images = $image->with('tags');
 	}
     /**
     *

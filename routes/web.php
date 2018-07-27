@@ -28,6 +28,7 @@ Route::get('dashboard', 'DashboardController@index');
 
 //images_page
 Route::get('images','ImageController@index');
+Route::get('images2','ImageController@test');
 Route::post('image', 'ImageController@store');
 Route::get('image/delete/{id}', 'ImageController@destroy');
 
@@ -40,4 +41,5 @@ Route::post('tags_edit/{id}', 'TagController@edit');
 //users_list_page
 Route::get('userslist','UserController@index');
 Route::post('user_add', 'UserController@store');
+Route::get('userslist2','UserController@test');
 
