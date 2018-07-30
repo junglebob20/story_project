@@ -4,26 +4,22 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Repositories\TagRepository;
+//use App\Repositories\TagRepository;
+use App\Repositories\Repository;
 use \Validator;
 use App\Tag;
 class TagController extends Controller
 {
-    /**
-    * UserRepository.
-    *
-    * @var UserRepository
-    */
     protected $tags;
     /**
     * Construct new controller.
     *
     * @return void
     */
-    public function __construct(TagRepository $tags)
+    public function __construct(Tag $tags)
     {
 
-        $this->tags = $tags;
+        $this->tags = new Repository($tags);
     }
     /**
      * Display a listing of the resource.
@@ -34,7 +30,7 @@ class TagController extends Controller
     {
         if(Auth::check()){
             return view('pages.tags', [
-                'items' => $this->tags->getAllTags(),
+                'items' => $this->tags->all(),
                 'sortColumn' => ['created_at','asc']
             ]);
         }
@@ -63,10 +59,10 @@ class TagController extends Controller
         if ($validator->fails()) {
             return back()->with('fail','Tag Adding failed');
         }else{
-            Tag::create([
+            $this->tags->create([
                 'name' => $request->name
             ]);
-
+        
             return back()->with('success','Tag Added successful');
         }
     }
@@ -93,7 +89,8 @@ class TagController extends Controller
      */
     public function show($id)
     {
-        
+        $selectedTag = $this->tags->show($id);
+        return $selectedTag;
     }
     /**
      * Display a listing of the resource.
@@ -101,8 +98,8 @@ class TagController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function test(){
-        $roles = Tag::find(2)->images()->get();
-        return $roles;
+        $tagShow = $this->tags->show(1);
+        return $tagShow;
     }
     /**
      * Show the form for editing the specified resource.
@@ -110,14 +107,9 @@ class TagController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Request $request, $id)
+    public function edit($id)
     {
-        if($request->has('name')){
-            Tag::find($id)->update(['name' => $request->name]);
-            return back()->with('success','Tag Edited successful');
-        }else{
-            return back()->with('fail','Tag Edding failed');
-        }
+
     }
 
     /**
@@ -129,7 +121,12 @@ class TagController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        if($request->has('name')){
+            $this->tags->update(['name' => $request->name],$id);
+            return back()->with('success','Tag Edited successful');
+        }else{
+            return back()->with('fail','Tag Edding failed');
+        }
     }
 
     /**
@@ -140,6 +137,10 @@ class TagController extends Controller
      */
     public function destroy($id)
     {
-        //
+        if($this->tags->delete($id)){
+            return back()->with('success','Tag Deleted successful');
+        }else{
+            return back()->with('fail','Tag Deleted failed');
+        }
     }
 }

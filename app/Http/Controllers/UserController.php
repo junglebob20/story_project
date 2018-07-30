@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use \Validator;
-use App\Repositories\UserRepository;
-use App\Repositories\RoleRepository;
+//use App\Repositories\UserRepository;
+//use App\Repositories\RoleRepository;
+use App\Repositories\Repository;
 use App\User;
-use App\Role;
 use Illuminate\Support\Facades\Hash;
 class UserController extends Controller
 {
@@ -23,10 +23,10 @@ class UserController extends Controller
      *
      * @return void
      */
-    public function __construct(UserRepository $users, RoleRepository $roles)
+    public function __construct(User $users)
     {
-        $this->users = $users;
-        $this->roles = $roles;
+
+        $this->users = new Repository($users);
     }
     /**
      * Display a listing of the resource.
@@ -37,20 +37,10 @@ class UserController extends Controller
     {
         if(Auth::check()){
             return view('pages.users_list', [
-                'items' => $this->users->getAllUsers(),
-                'roles' => $this->roles->getAllRoles()
+                'items' => $this->users->all()
             ]);
         }
         return redirect('login');
-    }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function test(){
-        $test = User::with('roles')->get();
-        return $test;
     }
     /**
      * Show the form for creating a new resource.
@@ -74,12 +64,12 @@ class UserController extends Controller
         if ($validator->fails()) {
             return back()->with('fail','User Adding failed');
         }else{
-            $newUser=User::create([
+            $newUser=$this->users->create([
                 'username' => $request->username,
                 'password' => Hash::make($request->password),
+                'role' => $request->role,
                 'remember_token' => '0'
             ]);
-            $newUser->roles()->attach([$request->role]);
             return back()->with('success','User Added successful');
         }
     }
@@ -94,8 +84,8 @@ class UserController extends Controller
     {
         $rules = [
             'username' => 'required|max:255',
-            'password' => 'required|required_with:password_confirmation|same:password_confirmation|min:6',
-            'password_confirmation' => 'required|min:6',
+            'password' => 'required|required_with:password_confirmation|same:password_confirmation|min:1',
+            'password_confirmation' => 'required|min:1',
             'role' => 'required|min:1',
             '_token' => 'required'
         ];
@@ -110,7 +100,8 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        
+        $selectedUser = $this->users->show($id);
+        return $selectedUser;
     }
 
     /**
@@ -133,7 +124,27 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $validator = $this->getValidator($request);
+        if ($validator->fails()) {
+            return back()->with('fail','User Adding failed');
+        }else{
+            if($request->password){
+                $this->users->update([
+                    'username' => $request->username,
+                    'password' => Hash::make($request->password),
+                    'role' => $request->role,
+                    'remember_token' => '0'
+                ],$id);
+            }else{
+                $this->users->update([
+                    'username' => $request->username,
+                    'role' => $request->role,
+                    'remember_token' => '0'
+                ],$id);
+            }
+
+            return back()->with('success','User Added successful');
+        }
     }
 
     /**
@@ -144,8 +155,10 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        if(User::where('id', $id)->delete()){
-            return redirect('userslist');
+        if($this->users->delete($id)){
+            return back()->with('success','User Deleted successful');
+        }else{
+            return back()->with('fail','User Deleted failed');
         }
     }
 }

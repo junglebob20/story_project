@@ -35,11 +35,23 @@ Route::get('image/delete/{id}', 'ImageController@destroy');
 //tags_page
 Route::get('tags','TagController@index');
 Route::get('tags2','TagController@test');
+
 Route::post('tags_add', 'TagController@store');
-Route::post('tags_edit/{id}', 'TagController@edit');
+
+Route::get('tag/{id}', 'TagController@show');
+Route::post('tags_edit/{id}', 'TagController@update');
+
+Route::post('tags_delete/{id}', 'TagController@destroy');
 
 //users_list_page
 Route::get('userslist','UserController@index');
-Route::post('user_add', 'UserController@store');
 Route::get('userslist2','UserController@test');
+
+Route::post('user_add', 'UserController@store');
+
+Route::get('user/{id}', 'UserController@show');
+Route::post('user_edit/{id}', 'UserController@update');
+
+Route::post('user_delete/{id}', 'UserController@destroy');
+
 

@@ -148,7 +148,7 @@
       }
     }
   }
-  #modal-open-add-user{
+  #modal-open-add-user,#modal-open-edit-user,#modal-open-delete-user{
     align-items: center;
     cursor: default;
     .modal-dialog{
@@ -197,7 +197,7 @@
       }
     }
   }
-  #modal-open-add-tag,#modal-open-edit-tag{
+  #modal-open-add-tag,#modal-open-edit-tag,#modal-open-delete-tag{
     align-items: center;
     cursor: default;
     .modal-dialog{

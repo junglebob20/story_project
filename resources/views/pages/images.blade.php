@@ -104,8 +104,13 @@
                         </div>
                         <div class="form-group">
                             <label for="tag_add" class="btn col-5">Tags:</label>
-                            <input type="text" name="tag_add" class="form-control col-6" id="tag_add" placeholder="Enter tag" required="">
+                            <select id="add_tags_select" class="form-control" name="tags[]" multiple="multiple">
+                                @foreach($tags as $k=>$tag)
+                                    <option value="{{ $tag->id }}">{{ $tag->name }}</option>
+                                @endforeach
+                              </select>
                         </div>
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">Submit</button>
@@ -119,7 +124,9 @@
 @endif
 <script>
     $(document).ready(function(){
-        console.log($('.img-item'));
+        $("#add_tags_select").select2({
+            tags: true
+        });
             $('.img-item').click(function(){
                 var img_item=$(this).clone();
                 console.log(img_item);

@@ -9,8 +9,8 @@ class ImageTagsTableSeeder extends Seeder{
     {
         DB::table('image_tags')->delete();
         ImageTags::create(array(
-            'image_id' => '0',
-            'tag_id' => '0'
+            'image_id' => '1',
+            'tag_id' => '1'
         ));
     }
 

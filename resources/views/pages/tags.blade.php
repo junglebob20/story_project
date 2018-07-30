@@ -48,9 +48,9 @@
                 <td>{{$item->updated_at}}</td>
                 <td class="col-action">
                     <div class="support-btns">
-                        <button type="button" data-id="{{$item->id}}" data-name="{{$item->name}}" data-toggle="modal" class="btn btn-primary tag-edit">
+                        <button type="button" data-id="{{$item->id}}" data-toggle="modal" class="btn btn-primary tag-edit">
                             <i class="fa fa-pencil" aria-hidden="true"></i>Edit</button>
-                        <button type="button" class="btn btn-primary tag-delete">
+                        <button type="button" data-id="{{$item->id}}" class="btn btn-primary tag-delete">
                             <i class="fa fa-trash" aria-hidden="true"></i>Delete</button>
                     </div>
                 </td>
@@ -63,7 +63,7 @@
     <div class="modal" id="modal-open-add-tag" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <form action="{{ url('tags_add') }}" method="post">
+                <form id="add_tag_form" action="{{ url('tags_add') }}" method="post">
                     <div class="modal-header">
                         <h5 class="modal-title">Add new tag</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -110,16 +110,59 @@
             </div>
         </div>
     </div>
+    <div class="modal" id="modal-open-delete-tag" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <form id="delete-form" action="" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Delete tag</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 @endif
 <script>
     $(document).ready(function(){
-        $('.tag-edit').click(function(e){
+        /*$('.tag-edit').click(function(e){
             var btn=$(this);
             var destinationModal=$('#modal-open-edit-tag');
             destinationModal.find('#edit-form').attr('action','tags_edit/'+btn.data('id'));
             destinationModal.find('#tag_name_input').attr('value',btn.data('name'));
             $('#modal-open-edit-tag').modal('show');
+        });*/
+        $('.tag-edit').click(function(e){
+                var btn=$(this);
+                $.ajax({
+                    url: "tag/"+btn.data('id'),
+                    type: 'get',
+                    success: function(data, textStatus, jqXHR)
+                    {
+                        var destinationModal=$('#modal-open-edit-tag');
+                        destinationModal.find('#edit-form').attr('action','tags_edit/'+data.id);
+                        destinationModal.find('#tag_name_input').attr('value',data.name);
+                        destinationModal.modal('show');
+                    },
+                    error: function(jqXHR, textStatus, errorThrown)
+                    {
+                        console.log("Error");
+                    }
+                });
+            });
+        $('.tag-delete').click(function(e){
+            var btn=$(this);
+            var destinationModal=$('#modal-open-delete-tag');
+            destinationModal.find('#delete-form').attr('action','tags_delete/'+btn.data('id'));
+            destinationModal.modal('show');
         });
     });
 </script>
