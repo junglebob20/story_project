@@ -65,7 +65,9 @@
               display: flex;
               flex-direction: row;
               label{
-  
+                display: flex;
+                justify-content: center;
+                align-items: center;
               }
               .select-image{
                 padding: .5rem .75rem;
@@ -111,6 +113,31 @@
                     width: 128px;
                     height: 128px;
                   }
+                }
+              }
+              .tags_selector{
+                padding: 0;
+                .select2-container{
+                  width: 100%!important;
+                }
+                .tags_container{
+                  border: 1px solid rgba(0,0,0,.15);
+                  border-radius: .25rem;
+                }
+                .select2-selection__choice{
+                  background-color: #e4e4e4;
+                  cursor: default;
+                  float: left;
+                  margin-right: 5px;
+                  margin-top: 5px;
+                  background: #f4f5f7;
+                  border: 1px solid #dfe1e6;
+                  border-radius: 3.01px;
+                  display: inline-block;
+                  font-size: 14px;
+                  font-weight: 400;
+                  padding: 1px 5px;
+                  text-decoration: none;
                 }
               }
             }

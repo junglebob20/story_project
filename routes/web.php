@@ -34,6 +34,8 @@ Route::get('image/delete/{id}', 'ImageController@destroy');
 
 //tags_page
 Route::get('tags','TagController@index');
+Route::get('tags_search','TagController@search');
+
 Route::get('tags2','TagController@test');
 
 Route::post('tags_add', 'TagController@store');

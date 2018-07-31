@@ -82,7 +82,7 @@
     <div class="modal" id="modal-open-add-img" tabindex="-1" role="dialog" style="display: none;" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <form id="addImage_form" action="http://127.0.0.1:8000/image" method="post" enctype="multipart/form-data">
+            <form id="addImage_form" action="{{url('/image')}}" method="post" enctype="multipart/form-data">
                     <div class="modal-header">
                         <h5 class="modal-title">Add New Image</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -104,11 +104,11 @@
                         </div>
                         <div class="form-group">
                             <label for="tag_add" class="btn col-5">Tags:</label>
-                            <select id="add_tags_select" class="form-control" name="tags[]" multiple="multiple">
-                                @foreach($tags as $k=>$tag)
-                                    <option value="{{ $tag->id }}">{{ $tag->name }}</option>
-                                @endforeach
-                              </select>
+                            <div class="tags_selector col-6">
+                                <select id="add_tags_select" class="form-control" name="tags[]" multiple="multiple">
+
+                                </select>
+                            </div>
                         </div>
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     </div>
@@ -124,9 +124,35 @@
 @endif
 <script>
     $(document).ready(function(){
+
         $("#add_tags_select").select2({
-            tags: true
+            tags: true,
+            placeholder: "Select a tags",
+            containerCssClass: "tags_container",
+            dropdownCssClass : 'tags_dropdown',
+            ajax:{
+                    url: "{{ url('/tags_search') }}",
+                    type: 'get',
+                    data: function (params) {
+                        var query = {
+                        name: params.term
+                    }
+                    // Query parameters will be ?search=[term]&type=public
+                    return query;
+                    },
+                    processResults: function(data)
+                    {
+                        return {
+                            results: data
+                        };
+                    }
+                }
         });
+        $("#add_tags_select").on("select2:open", function(event) {
+            $('input.select2-search__field').attr('placeholder', 'Add New Tag');
+        });
+
+
             $('.img-item').click(function(){
                 var img_item=$(this).clone();
                 console.log(img_item);

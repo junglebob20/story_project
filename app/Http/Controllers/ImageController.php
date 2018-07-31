@@ -91,13 +91,18 @@ class ImageController extends Controller
                 ]);
 
                 $tags=$request->input('tags');
-                
-                /*foreach($tags as $k => $tag){
-                    if($this->tags->show($tag)){
 
+                $tagsToSync=array();
+                foreach($tags as $k => $tag){
+                    $checkedTag=$this->tags->all()->where('name',$tag)->first();
+                    if($checkedTag){
+                        array_push($tagsToSync,$checkedTag->id);
+                    }else{
+                        $newTag=$this->tags->create(['name' => $tag]);
+                        array_push($tagsToSync,$newTag->id);
                     }
-                }*/
-                $newImage->tags()->sync($tags);
+                }
+                $newImage->tags()->sync($tagsToSync);
 
                 return back()->with('success','Image Upload successful');
             }else{

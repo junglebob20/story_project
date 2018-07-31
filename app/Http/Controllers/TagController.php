@@ -97,9 +97,13 @@ class TagController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function search(Request $request){
+
+            return $this->tags->getModel()->where('name', 'LIKE', '%'.$request->name.'%')->select('id', 'name as text')->get();
+
+    }
     public function test(){
-        $tagShow = $this->tags->show(1);
-        return $tagShow;
+            return $this->tags->getModel()->where('name', 'LIKE', '%tag%')->select('id', 'name as text')->get();
     }
     /**
      * Show the form for editing the specified resource.
