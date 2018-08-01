@@ -91,10 +91,10 @@ class ImageController extends Controller
                 ]);
 
                 $tags=$request->input('tags');
-
+                
                 $tagsToSync=array();
                 foreach($tags as $k => $tag){
-                    $checkedTag=$this->tags->all()->where('name',$tag)->first();
+                    $checkedTag=$this->tags->all()->where('id',$tag)->first();
                     if($checkedTag){
                         array_push($tagsToSync,$checkedTag->id);
                     }else{
@@ -143,7 +143,10 @@ class ImageController extends Controller
      */
     public function show($id)
     {
-        
+        $selectedImage = $this->images->with(['tags' => function($query) {
+            $query->select('*','name as text');
+        }])->where('id',$id)->get()->first();
+        return $selectedImage;
     }
 
     /**
@@ -177,6 +180,11 @@ class ImageController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $this->images->show($id)->tags()->detach();
+        if($this->images->delete($id)){
+            return back()->with('success','Image Deleted successful');
+        }else{
+            return back()->with('fail','Image Deleted failed');
+        }
     }
 }

@@ -45,7 +45,7 @@
       height: 100%;
     }
   }
-  #modal-open-add-img{
+  #modal-open-add-img,#modal-open-edit-image,#modal-open-delete-image{
     align-items: center;
     cursor: default;
     .modal-dialog{
@@ -405,7 +405,6 @@
           display: flex;
           flex-direction: column;
           padding: 15px;
-          overflow: auto;
           .content-addimage{
             padding: 10px 20px;
             display: flex;
@@ -473,6 +472,8 @@
             }
           }
           .content-imagedata{
+            overflow: auto;
+            margin-bottom: 30px;
             .table{
               td,th{
                 text-align: center;

@@ -58,9 +58,9 @@
                 </td>
                 <td class="col-action">
                     <div class="support-btns">
-                        <button type="button" class="btn btn-primary">
+                        <button type="button" class="btn btn-primary tag-edit" data-id="{{$item->id}}">
                             <i class="fa fa-pencil" aria-hidden="true"></i>Edit</button>
-                        <button type="button" class="btn btn-primary">
+                        <button type="button" class="btn btn-primary tag-delete" data-id="{{$item->id}}">
                             <i class="fa fa-trash" aria-hidden="true"></i>Delete</button>
                     </div>
                 </td>
@@ -120,12 +120,72 @@
             </div>
         </div>
     </div>
+    <div class="modal" id="modal-open-edit-image" tabindex="-1" role="dialog" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <form id="edit-form" action="" method="post" enctype="multipart/form-data">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Image</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <div class="img-uploader" id="img-uploader-edit">
+                                <div class="uploaded-image">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="btn col-5">Image:</label>
+                            <label for="addimage_btn" class="form-control btn col-6 select-image">Choose image</label>
+                            <input style="display:none;" name="image" type="file" class="form-control-file" id="addimage_btn">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_tags_select" class="btn col-5">Tags:</label>
+                            <div class="tags_selector col-6">
+                                <select id="edit_tags_select" class="form-control" name="tags[]" multiple="multiple">
+
+                                </select>
+                            </div>
+                        </div>
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="modal-open-delete-image" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <form id="delete-form" action="" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Delete image</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 @endif
 <script>
     $(document).ready(function(){
 
-        $("#add_tags_select").select2({
+        $("#add_tags_select,#edit_tags_select").select2({
             tags: true,
             placeholder: "Select a tags",
             containerCssClass: "tags_container",
@@ -152,6 +212,36 @@
             $('input.select2-search__field').attr('placeholder', 'Add New Tag');
         });
 
+        $('.tag-edit').click(function(e){
+                var btn=$(this);
+                $.ajax({
+                    url: "image/"+btn.data('id'),
+                    type: 'get',
+                    success: function(data, textStatus, jqXHR)
+                    {
+                        console.log(data);
+                        var destinationModal=$('#modal-open-edit-image');
+                        destinationModal.find('#edit-form').attr('action','image_edit/'+data.id);
+                        //destinationModal.find('#tag_name_input').attr('value',data.name);
+                        data.tags.forEach(function(tag){
+                            destinationModal.find('#edit_tags_select').append('<option selected="selected">'+tag.text+'</option>');
+                        });
+                        destinationModal.find('#img-uploader-edit > div.uploaded-image').append('<img src="'+data.path+'/'+data.name+'.'+data.ext+'" alt="'+data.name+'">');
+                        destinationModal.modal('show');
+                    },
+                    error: function(jqXHR, textStatus, errorThrown)
+                    {
+                        console.log("Error");
+                    }
+                });
+        });
+
+        $('.tag-delete').click(function(e){
+            var btn=$(this);
+            var destinationModal=$('#modal-open-delete-image');
+            destinationModal.find('#delete-form').attr('action','image/delete/'+btn.data('id'));
+            destinationModal.modal('show');
+        });
 
             $('.img-item').click(function(){
                 var img_item=$(this).clone();

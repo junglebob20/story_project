@@ -30,7 +30,7 @@ class TagController extends Controller
     {
         if(Auth::check()){
             return view('pages.tags', [
-                'items' => $this->tags->all(),
+                'items' => $this->tags->getModel()->limit(10)->get(),
                 'sortColumn' => ['created_at','asc']
             ]);
         }
@@ -146,5 +146,14 @@ class TagController extends Controller
         }else{
             return back()->with('fail','Tag Deleted failed');
         }
+    }
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function lazyLoading(Request $request)
+    {
+        return $this->tags->getModel()->offset($request->offset)->limit(10)->get();
     }
 }

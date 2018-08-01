@@ -165,5 +165,29 @@
             destinationModal.modal('show');
         });
     });
+    $( ".content-imagedata" ).scroll(function() {
+        if ($('.content-imagedata').scrollTop() >= ($(document).height() - $('.content-imagedata').height())*0.8 && !$( ".content-imagedata" ).hasClass('lazy-loading')){
+            $( ".content-imagedata" ).addClass('lazy-loading');
+            var offset=$('.content-imagedata > table > tbody > tr').length;
+            $.ajax({
+                    url: "tags_loading",
+                    type: 'post',
+                    data:{offset:offset,_token:'{{ csrf_token() }}'},
+                    success: function(data)
+                    {
+                        
+                        data.forEach(function(item){
+                            jQuery('div.content-imagedata > table > tbody').append('<tr><th scope="row">'+item.id+'</th><td>'+item.name+'</td><td>'+item.created_at+'</td><td>'+item.updated_at+'</td><td class="col-action"><div class="support-btns"><button type="button" data-id="'+item.id+'" data-toggle="modal" class="btn btn-primary tag-edit"><i class="fa fa-pencil" aria-hidden="true"></i>Edit</button><button type="button" data-id="'+item.id+'" class="btn btn-primary tag-delete"><i class="fa fa-trash" aria-hidden="true"></i>Delete</button></div></td></tr>');
+                        });
+                        $( ".content-imagedata" ).removeClass('lazy-loading');
+                    },
+                    error: function()
+                    {
+                        console.log("Error");
+                    }
+            });
+            
+        }
+    });
 </script>
 @stop

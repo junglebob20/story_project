@@ -30,13 +30,17 @@ Route::get('dashboard', 'DashboardController@index');
 Route::get('images','ImageController@index');
 Route::get('images2','ImageController@test');
 Route::post('image', 'ImageController@store');
-Route::get('image/delete/{id}', 'ImageController@destroy');
+
+Route::get('image/{id}', 'ImageController@show');
+Route::post('image_edit/{id}', 'ImageController@update');
+
+Route::post('image/delete/{id}', 'ImageController@destroy');
 
 //tags_page
 Route::get('tags','TagController@index');
 Route::get('tags_search','TagController@search');
 
-Route::get('tags2','TagController@test');
+//Route::get('tags2','TagController@test');
 
 Route::post('tags_add', 'TagController@store');
 
@@ -44,6 +48,8 @@ Route::get('tag/{id}', 'TagController@show');
 Route::post('tags_edit/{id}', 'TagController@update');
 
 Route::post('tags_delete/{id}', 'TagController@destroy');
+
+Route::post('tags_loading', 'TagController@lazyLoading');
 
 //users_list_page
 Route::get('userslist','UserController@index');
