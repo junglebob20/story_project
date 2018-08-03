@@ -49,7 +49,9 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
+        return view('pages.users_list_modal',[
+            'modal' => 'add_user'
+        ]);
     }
 
     /**
@@ -103,7 +105,6 @@ class UserController extends Controller
         $selectedUser = $this->users->show($id);
         return $selectedUser;
     }
-
     /**
      * Show the form for editing the specified resource.
      *
@@ -112,17 +113,19 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        //
+        $item = $this->users->show($id);
+        return view('pages.users_list_modal',[
+            'modal' => 'edit_user',
+            'item' => $item
+        ]);
     }
-
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         $validator = $this->getValidator($request);
         if ($validator->fails()) {
@@ -134,28 +137,40 @@ class UserController extends Controller
                     'password' => Hash::make($request->password),
                     'role' => $request->role,
                     'remember_token' => '0'
-                ],$id);
+                ],$request->id);
             }else{
                 $this->users->update([
                     'username' => $request->username,
                     'role' => $request->role,
                     'remember_token' => '0'
-                ],$id);
+                ],$request->id);
             }
 
             return back()->with('success','User Added successful');
         }
     }
-
+    /**
+     * Show the form for deleting the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function delete($id){
+        $item = $this->users->show($id);
+        return view('pages.users_list_modal',[
+            'modal' => 'delete_user',
+            'item' => $item
+        ]);
+    }
     /**
      * Remove the specified resource from storage.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        if($this->users->delete($id)){
+        if($this->users->delete($request->id)){
             return back()->with('success','User Deleted successful');
         }else{
             return back()->with('fail','User Deleted failed');

@@ -44,9 +44,8 @@ class TagController extends Controller
      */
     public function create()
     {
-        //
+        return '<div class="modal" id="modal-open-add-tag" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog" role="document"> <div class="modal-content"> <form id="add_tag_form" action="/tags_add" method="post"> <div class="modal-header"> <h5 class="modal-title">Add new tag</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">×</span> </button> </div><div class="modal-body"> <div class="form-group"> <label for="tag_name_input">Tag_name</label> <input type="text" name="name" class="form-control" id="tag_name_input" placeholder="Enter Tag" required=""> </div></div><div class="modal-footer"> <button type="submit" class="btn btn-primary">Submit</button> <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> </div><input type="hidden" name="_token" value="'.csrf_token().'"> </form> </div></div></div>';
     }
-
     /**
      * Store a newly created resource in storage.
      *
@@ -102,8 +101,8 @@ class TagController extends Controller
             return $this->tags->getModel()->where('name', 'LIKE', '%'.$request->name.'%')->select('id', 'name as text')->get();
 
     }
-    public function test(){
-            return $this->tags->getModel()->where('name', 'LIKE', '%tag%')->select('id', 'name as text')->get();
+    public function deleteForm($id){
+        return '<div class="modal" id="modal-open-delete-tag" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog" role="document"> <div class="modal-content"> <form id="delete-form" action="/tags_delete/'.$id.'" method="post"> <div class="modal-header"> <h5 class="modal-title">Delete tag</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">×</span> </button> </div><div class="modal-footer"> <button type="submit" class="btn btn-primary">Submit</button> <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> </div><input type="hidden" name="_token" value="'.csrf_token().'"> </form> </div></div></div>';
     }
     /**
      * Show the form for editing the specified resource.
@@ -113,7 +112,8 @@ class TagController extends Controller
      */
     public function edit($id)
     {
-
+        $selectedTag = $this->tags->show($id);
+        return '<div class="modal" id="modal-open-edit-tag" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog" role="document"> <div class="modal-content"> <form id="edit-form" action="tags_edit/'.$selectedTag->id.'" method="post"> <div class="modal-header"> <h5 class="modal-title">Edit tag - "'.$selectedTag->name.'"</h5> <button type="button" id="close_edit_tag_modal" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">×</span> </button> </div><div class="modal-body"> <div class="form-group"> <label for="tag_name_input">Tag_name</label> <input type="text" name="name" class="form-control" id="tag_name_input" placeholder="Enter Tag" required="" value="'.$selectedTag->name.'"> </div></div><div class="modal-footer"> <button type="submit" class="btn btn-primary">Submit</button> <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> </div><input type="hidden" name="_token" value="'.csrf_token().'"> </form> </div></div></div>';
     }
 
     /**

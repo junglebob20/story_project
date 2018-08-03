@@ -16,7 +16,7 @@
 
   </div>
   @endif
-    <button type="button" data-toggle="modal" data-target="#modal-open-add-img" class="btn btn-dark">
+    <button type="button" id="modal-open-add-img-btn" class="btn btn-dark">
         <i class="fa fa-plus-circle" aria-hidden="true"></i>Add new image</button>
 </div>
 <div class="content-search">
@@ -79,155 +79,28 @@
             </div>
         </div>
     </div>
-    <div class="modal" id="modal-open-add-img" tabindex="-1" role="dialog" style="display: none;" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-            <form id="addImage_form" action="{{url('/image')}}" method="post" enctype="multipart/form-data">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Add New Image</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group" style="display:none;">
-                            <div class="img-uploader" id="img-uploader">
-                                <div class="uploaded-image">
-                                    <img src="" alt="">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="btn col-5">Image:</label>
-                            <label for="addimage_btn" class="form-control btn col-6 select-image">Choose image</label>
-                            <input style="display:none;" name="image" type="file" class="form-control-file" id="addimage_btn">
-                        </div>
-                        <div class="form-group">
-                            <label for="tag_add" class="btn col-5">Tags:</label>
-                            <div class="tags_selector col-6">
-                                <select id="add_tags_select" class="form-control" name="tags[]" multiple="multiple">
-
-                                </select>
-                            </div>
-                        </div>
-                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="modal" id="modal-open-edit-image" tabindex="-1" role="dialog" style="display: none;" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-            <form id="edit-form" action="" method="post" enctype="multipart/form-data">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Edit Image</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <div class="img-uploader" id="img-uploader-edit">
-                                <div class="uploaded-image">
-                                    
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="btn col-5">Image:</label>
-                            <label for="addimage_btn" class="form-control btn col-6 select-image">Choose image</label>
-                            <input style="display:none;" name="image" type="file" class="form-control-file" id="addimage_btn">
-                        </div>
-                        <div class="form-group">
-                            <label for="edit_tags_select" class="btn col-5">Tags:</label>
-                            <div class="tags_selector col-6">
-                                <select id="edit_tags_select" class="form-control" name="tags[]" multiple="multiple">
-
-                                </select>
-                            </div>
-                        </div>
-                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="modal" id="modal-open-delete-image" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-            <form id="delete-form" action="" method="post">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Delete image</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    </div>
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                </form>
-            </div>
-        </div>
-    </div>
 </div>
 @endif
 <script>
     $(document).ready(function(){
-
-        $("#add_tags_select,#edit_tags_select").select2({
-            tags: true,
-            placeholder: "Select a tags",
-            containerCssClass: "tags_container",
-            dropdownCssClass : 'tags_dropdown',
-            ajax:{
-                    url: "{{ url('/tags_search') }}",
-                    type: 'get',
-                    data: function (params) {
-                        var query = {
-                        name: params.term
-                    }
-                    // Query parameters will be ?search=[term]&type=public
-                    return query;
-                    },
-                    processResults: function(data)
-                    {
-                        return {
-                            results: data
-                        };
-                    }
-                }
-        });
         $("#add_tags_select").on("select2:open", function(event) {
             $('input.select2-search__field').attr('placeholder', 'Add New Tag');
         });
 
         $('.tag-edit').click(function(e){
-                var btn=$(this);
+            var btn=$(this);
+                var urlAjax="image/"+btn.data('id')+"/edit";
+                console.log(urlAjax);
                 $.ajax({
-                    url: "image/"+btn.data('id'),
+                    url: urlAjax,
                     type: 'get',
                     success: function(data, textStatus, jqXHR)
                     {
-                        console.log(data);
-                        var destinationModal=$('#modal-open-edit-image');
-                        destinationModal.find('#edit-form').attr('action','image_edit/'+data.id);
-                        //destinationModal.find('#tag_name_input').attr('value',data.name);
-                        data.tags.forEach(function(tag){
-                            destinationModal.find('#edit_tags_select').append('<option selected="selected">'+tag.text+'</option>');
+                        $('body').append(data);
+                        $('#modal-open-edit-image').modal('show');
+                        $('#modal-open-edit-image').on('hide.bs.modal', function (e) {
+                            $('#modal-open-edit-image').remove();
                         });
-                        destinationModal.find('#img-uploader-edit > div.uploaded-image').append('<img src="'+data.path+'/'+data.name+'.'+data.ext+'" alt="'+data.name+'">');
-                        destinationModal.modal('show');
                     },
                     error: function(jqXHR, textStatus, errorThrown)
                     {
@@ -238,11 +111,46 @@
 
         $('.tag-delete').click(function(e){
             var btn=$(this);
-            var destinationModal=$('#modal-open-delete-image');
-            destinationModal.find('#delete-form').attr('action','image/delete/'+btn.data('id'));
-            destinationModal.modal('show');
+            var urlAjax="image/"+btn.data('id')+"/delete";
+            console.log(urlAjax);
+                $.ajax({
+                    url: urlAjax,
+                    type: 'get',
+                    success: function(data, textStatus, jqXHR)
+                    {
+                        $('body').append(data);
+                        $('#modal-open-delete-image').modal('show');
+                        $('#modal-open-delete-image').on('hide.bs.modal', function (e) {
+                            $('#modal-open-delete-image').remove();
+                        });
+                    },
+                    error: function(jqXHR, textStatus, errorThrown)
+                    {
+                        console.log("Error");
+                    }
+                });
         });
-
+        $('#modal-open-add-img-btn').click(function(e){
+            var btn=$(this);
+            var urlAjax="image/add";
+            console.log(urlAjax);
+                $.ajax({
+                    url: urlAjax,
+                    type: 'get',
+                    success: function(data, textStatus, jqXHR)
+                    {
+                        $('body').append(data);
+                        $('#modal-open-add-img').modal('show');
+                        $('#modal-open-add-img').on('hide.bs.modal', function (e) {
+                            $('#modal-open-add-img').remove();
+                        });
+                    },
+                    error: function(jqXHR, textStatus, errorThrown)
+                    {
+                        console.log("Error");
+                    }
+                });
+        });
             $('.img-item').click(function(){
                 var img_item=$(this).clone();
                 console.log(img_item);

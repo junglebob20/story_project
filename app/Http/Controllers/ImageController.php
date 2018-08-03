@@ -46,9 +46,8 @@ class ImageController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function test(){
-        $tags = $this->images->show(1)->tags()->get();
-        return $tags;
+    public function test(Request $request){
+        dd($request);
     }
     /**
      * Show the form for creating a new resource.
@@ -57,9 +56,34 @@ class ImageController extends Controller
      */
     public function create()
     {
-        //
+        return view('pages.images_modal',[
+            'modal' => 'add_image'
+        ]);
     }
-
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function thumbnail(Request $request)
+    {
+        $validator = $this->getValidator($request);
+        if ($validator->fails()) {
+            return back()->with('fail','Image Upload failed, please check your image');
+        }else{
+            if( $request->hasFile('image') ) {
+                $input['imageName'] = time();
+                $input['imageExt'] = $image->getClientOriginalExtension();
+                $destinationPath = public_path('storage/thumbnail_images');
+                $img = ImageManager::make($image->getRealPath());
+                if(!$this->check_imageSize($image)){
+                    $img->resize(512, 512);
+                }
+            }
+            return $img;
+        }
+    }
     /**
      * Store a newly created resource in storage.
      *
@@ -157,17 +181,35 @@ class ImageController extends Controller
      */
     public function edit($id)
     {
-        //
+        $item = $this->images->with(['tags' => function($query) {
+            $query->select('*','name as text');
+        }])->where('id',$id)->get()->first();
+        return view('pages.images_modal',[
+            'modal' => 'edit_image',
+            'item' => $item
+        ]);
     }
-
+    /**
+     * Show the form for deleting the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function delete($id)
+    {
+        $item = $this->images->show($id);
+        return view('pages.images_modal',[
+            'modal' => 'delete_image',
+            'item' => $item
+        ]);
+    }
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         //
     }
@@ -178,10 +220,10 @@ class ImageController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
-        $this->images->show($id)->tags()->detach();
-        if($this->images->delete($id)){
+    public function destroy(Request $request)
+    {   
+        $this->images->show($request->id)->tags()->detach();
+        if($this->images->delete($request->id)){
             return back()->with('success','Image Deleted successful');
         }else{
             return back()->with('fail','Image Deleted failed');

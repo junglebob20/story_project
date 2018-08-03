@@ -28,38 +28,50 @@ Route::get('dashboard', 'DashboardController@index');
 
 //images_page
 Route::get('images','ImageController@index');
-Route::get('images2','ImageController@test');
-Route::post('image', 'ImageController@store');
 
-Route::get('image/{id}', 'ImageController@show');
-Route::post('image_edit/{id}', 'ImageController@update');
+Route::get('image/add', 'ImageController@create');
+Route::post('image/thumbnail', 'ImageController@thumbnail');
+Route::post('image/add', 'ImageController@store');
 
-Route::post('image/delete/{id}', 'ImageController@destroy');
+Route::get('image/{id}/edit', 'ImageController@edit');
+Route::post('image/update', 'ImageController@update');
+
+Route::get('image/{id}/delete', 'ImageController@delete');
+Route::post('image/destroy', 'ImageController@destroy');
+
 
 //tags_page
 Route::get('tags','TagController@index');
 Route::get('tags_search','TagController@search');
 
-//Route::get('tags2','TagController@test');
+Route::get('tags_add_create', 'TagController@create');
+
+Route::get('tag/{id}/deleteForm', 'TagController@deleteForm');
 
 Route::post('tags_add', 'TagController@store');
 
 Route::get('tag/{id}', 'TagController@show');
+
+Route::get('tag_edit_form/{id}', 'TagController@edit');
+
 Route::post('tags_edit/{id}', 'TagController@update');
 
 Route::post('tags_delete/{id}', 'TagController@destroy');
 
 Route::post('tags_loading', 'TagController@lazyLoading');
 
+
+
 //users_list_page
 Route::get('userslist','UserController@index');
-Route::get('userslist2','UserController@test');
 
-Route::post('user_add', 'UserController@store');
+Route::get('user/add', 'UserController@create');
+Route::post('user/add', 'UserController@store');
 
-Route::get('user/{id}', 'UserController@show');
-Route::post('user_edit/{id}', 'UserController@update');
+Route::get('user/{id}/edit', 'UserController@edit');
+Route::post('user/update', 'UserController@update');
 
-Route::post('user_delete/{id}', 'UserController@destroy');
+Route::get('user/{id}/delete', 'UserController@delete');
+Route::post('user/destroy', 'UserController@destroy');
 
 

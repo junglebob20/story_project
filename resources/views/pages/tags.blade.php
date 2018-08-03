@@ -16,7 +16,7 @@
 
   </div>
   @endif
-    <button type="button" data-toggle="modal" data-target="#modal-open-add-tag" class="btn btn-dark">
+    <button type="button" id="modal-open-add-tag-btn" class="btn btn-dark">
         <i class="fa fa-plus-circle" aria-hidden="true"></i>Add new tag</button>
 </div>
 <div class="content-search">
@@ -59,98 +59,21 @@
         </tbody>
     </table>
 </div>
-<div class="support-modal-wrapper">
-    <div class="modal" id="modal-open-add-tag" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <form id="add_tag_form" action="{{ url('tags_add') }}" method="post">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Add new tag</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="tag_name_input">Tag_name</label>
-                            <input type="text" name="name" class="form-control" id="tag_name_input" placeholder="Enter Tag" required="">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    </div>
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="modal" id="modal-open-edit-tag" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <form id="edit-form" action="" method="post">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Edit tag</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="tag_name_input">Tag_name</label>
-                            <input type="text" name="name" class="form-control" id="tag_name_input" placeholder="Enter Tag" required="">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    </div>
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="modal" id="modal-open-delete-tag" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-            <form id="delete-form" action="" method="post">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Delete tag</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    </div>
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 @endif
 <script>
-    $(document).ready(function(){
-        /*$('.tag-edit').click(function(e){
-            var btn=$(this);
-            var destinationModal=$('#modal-open-edit-tag');
-            destinationModal.find('#edit-form').attr('action','tags_edit/'+btn.data('id'));
-            destinationModal.find('#tag_name_input').attr('value',btn.data('name'));
-            $('#modal-open-edit-tag').modal('show');
-        });*/
+    function clickEventInit(){
         $('.tag-edit').click(function(e){
                 var btn=$(this);
                 $.ajax({
-                    url: "tag/"+btn.data('id'),
+                    url: "tag_edit_form/"+btn.data('id'),
                     type: 'get',
                     success: function(data, textStatus, jqXHR)
                     {
-                        var destinationModal=$('#modal-open-edit-tag');
-                        destinationModal.find('#edit-form').attr('action','tags_edit/'+data.id);
-                        destinationModal.find('#tag_name_input').attr('value',data.name);
-                        destinationModal.modal('show');
+                        $('body').append(data);
+                        $('#modal-open-edit-tag').modal('show');
+                        $('#modal-open-edit-tag').on('hide.bs.modal', function (e) {
+                            $('#modal-open-edit-tag').remove();
+                        });
                     },
                     error: function(jqXHR, textStatus, errorThrown)
                     {
@@ -160,13 +83,49 @@
             });
         $('.tag-delete').click(function(e){
             var btn=$(this);
-            var destinationModal=$('#modal-open-delete-tag');
-            destinationModal.find('#delete-form').attr('action','tags_delete/'+btn.data('id'));
-            destinationModal.modal('show');
+            var urlAjax="tag/"+btn.data('id')+"/deleteForm";
+            console.log(urlAjax);
+                $.ajax({
+                    url: urlAjax,
+                    type: 'get',
+                    success: function(data, textStatus, jqXHR)
+                    {
+                        $('body').append(data);
+                        $('#modal-open-delete-tag').modal('show');
+                        $('#modal-open-delete-tag').on('hide.bs.modal', function (e) {
+                            $('#modal-open-delete-tag').remove();
+                        });
+                    },
+                    error: function(jqXHR, textStatus, errorThrown)
+                    {
+                        console.log("Error");
+                    }
+                });
         });
-    });
-    $( ".content-imagedata" ).scroll(function() {
-        if ($('.content-imagedata').scrollTop() >= ($(document).height() - $('.content-imagedata').height())*0.8 && !$( ".content-imagedata" ).hasClass('lazy-loading')){
+    }
+    $(document).ready(function(){
+        clickEventInit();
+            $('#modal-open-add-tag-btn').click(function(e){
+                $.ajax({
+                    url: "tags_add_create",
+                    type: 'get',
+                    success: function(data, textStatus, jqXHR)
+                    {
+                        $('body').append(data);
+                        $('#modal-open-add-tag').modal('show');
+                        $('#modal-open-add-tag').on('hide.bs.modal', function (e) {
+                            $('#modal-open-add-tag').remove();
+                        });
+                    },
+                    error: function(jqXHR, textStatus, errorThrown)
+                    {
+                        console.log("Error");
+                    }
+                });
+            });
+            
+        $( ".content-imagedata" ).scroll(function() {
+        if ($('.content-imagedata').scrollTop() >=  ($('.main-content').height()-$('.content-imagedata').height())*0.8 && !$( ".content-imagedata" ).hasClass('lazy-loading')){
             $( ".content-imagedata" ).addClass('lazy-loading');
             var offset=$('.content-imagedata > table > tbody > tr').length;
             $.ajax({
@@ -179,6 +138,7 @@
                         data.forEach(function(item){
                             jQuery('div.content-imagedata > table > tbody').append('<tr><th scope="row">'+item.id+'</th><td>'+item.name+'</td><td>'+item.created_at+'</td><td>'+item.updated_at+'</td><td class="col-action"><div class="support-btns"><button type="button" data-id="'+item.id+'" data-toggle="modal" class="btn btn-primary tag-edit"><i class="fa fa-pencil" aria-hidden="true"></i>Edit</button><button type="button" data-id="'+item.id+'" class="btn btn-primary tag-delete"><i class="fa fa-trash" aria-hidden="true"></i>Delete</button></div></td></tr>');
                         });
+
                         $( ".content-imagedata" ).removeClass('lazy-loading');
                     },
                     error: function()
@@ -188,6 +148,7 @@
             });
             
         }
+    });
     });
 </script>
 @stop
