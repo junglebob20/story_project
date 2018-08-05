@@ -33,10 +33,10 @@ class TagController extends Controller
         if($request->q){
             $this->query->where('name', 'LIKE', '%'.$query.'%')->orWhere('id', 'LIKE', '%'.$query.'%')->orWhere('id', 'LIKE', '%'.$query.'%');
         }
-        if($request->order && $request->order_t){
+        if($request->sort && $request->order){
             
-            $this->query->orderBy($request->order,$request->order_t)->limit(10);
-            $sortColumn=[$request->order,$request->order_t];
+            $this->query->orderBy($request->sort,$request->order)->limit(10);
+            $sortColumn=[$request->sort,$request->order];
         }else{
             $this->query->limit(10);
             $sortColumn=['created_at','asc'];

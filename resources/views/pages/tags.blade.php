@@ -34,10 +34,10 @@
     <table class="table">
         <thead>
             <tr>
-                <th scope="col" class="table-col"><a href="">Id</a></th>
-                <th scope="col" class="table-col">Tag_name</th>
-                <th scope="col" class="table-col">Created_at</th>
-                <th scope="col" class="table-col">Updated_at</th>
+                <th scope="col" class="table-col">@sortablelink('id')</th>
+                <th scope="col" class="table-col">@sortablelink('name')</th>
+                <th scope="col" class="table-col">@sortablelink('created_at')</th>
+                <th scope="col" class="table-col">@sortablelink('updated_at')</th>
                 <th scope="col" class="table-col">Action</th>
             </tr>
         </thead>
@@ -60,6 +60,7 @@
             @endforeach
         </tbody>
     </table>
+    
 </div>
 @endif
 <script>

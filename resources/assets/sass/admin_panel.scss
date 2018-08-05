@@ -23,12 +23,8 @@
       background: #f9f9f9;
     }
     a{
-      position: absolute;
-      z-index: 3;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      color: #292b2c;
+      text-decoration: none;
     }
     .fa{
       margin-left: 5px;
@@ -527,6 +523,11 @@
             .table{
               td,th{
                 text-align: center;
+              }
+              .table-col{
+                a{
+                  position: static;
+                }
               }
               img{
                 cursor: pointer;
