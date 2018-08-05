@@ -10,6 +10,7 @@ use Intervention\Image\ImageManagerStatic as ImageManager;
 use \Validator;
 use App\Image;
 use App\Tag;
+use Illuminate\Support\Facades\Storage;
 class ImageController extends Controller
 {
     protected $images;
@@ -115,7 +116,7 @@ class ImageController extends Controller
                 ]);
 
                 $tags=$request->input('tags');
-                
+             
                 $tagsToSync=array();
                 foreach($tags as $k => $tag){
                     $checkedTag=$this->tags->all()->where('id',$tag)->first();
@@ -144,7 +145,8 @@ class ImageController extends Controller
     protected function getValidator(Request $request)
     {
         $rules = [
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:4096'
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
+            'tags' => 'required'
         ];
 
         return Validator::make($request->all(), $rules);
@@ -211,9 +213,49 @@ class ImageController extends Controller
      */
     public function update(Request $request)
     {
-        //
-    }
+        $validator = $this->getValidator($request);
+        
+        if ($validator->fails()) {
+            return back()->with('fail','Image Upload failed, please check your image');
+        }else{
+            if($request->hasFile('image')) {
+                $tags=$request->input('tags');
+                $this->deleteImageFromStorage($request->id);
+                $image = $request->file('image');
+                $input['imageName'] = time();
+                $input['imageExt'] = $image->getClientOriginalExtension();
+                $destinationPath = public_path('storage/images');
+                $img = ImageManager::make($image->getRealPath());
+                if(!$this->check_imageSize($image)){
+                    $img->resize(512, 512);
+                }
+                $img->save($destinationPath.'/'.$input['imageName'].'.'.$input['imageExt']);
 
+                $this->images->update([
+                    'name' => $input['imageName'],
+                    'path'=> 'storage/images/',
+                    'ext'=> $input['imageExt']
+                ],$request->id);
+            }
+
+            $tagsToSync=array();
+            foreach($tags as $k => $tag){
+                $checkedTag=$this->tags->all()->where('id',$tag)->first();
+                if($checkedTag){
+                    array_push($tagsToSync,$checkedTag->id);
+                }else{
+                    $newTag=$this->tags->create(['name' => $tag]);
+                    array_push($tagsToSync,$newTag->id);
+                }
+            }
+            $this->images->show($request->id)->tags()->sync($tagsToSync);
+                            return back()->with('success','Image Upload successful');
+        }
+    }
+    protected function deleteImageFromStorage($id){
+        $currentImage=$this->images->show($id);
+        Storage::disk('public')->delete('images/'.$currentImage->name.'.'.$currentImage->ext);
+    }
     /**
      * Remove the specified resource from storage.
      *

@@ -20,11 +20,13 @@
         <i class="fa fa-plus-circle" aria-hidden="true"></i>Add new tag</button>
 </div>
 <div class="content-search">
-    <form action="">
-        <div class="form-group">
-            <label for="search_input">Search:</label>
-            <input type="text" class="form-control" id="search_input" placeholder="Search">
-        </div>
+    <form id="search_form" action="{{url('tags')}}" method="GET">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Search" name="q" aria-label="Search" aria-describedby="basic-addon2" value="{{$query or ''}}">
+            <div id="search_input_btn" class="input-group-append">
+                <span class="input-group-text" id="basic-addon2">Search</span>
+            </div>
+        </div> 
     </form>
 </div>
 @if (count($items)>0)
@@ -32,7 +34,7 @@
     <table class="table">
         <thead>
             <tr>
-                <th scope="col" class="table-col">Id</th>
+                <th scope="col" class="table-col"><a href="">Id</a></th>
                 <th scope="col" class="table-col">Tag_name</th>
                 <th scope="col" class="table-col">Created_at</th>
                 <th scope="col" class="table-col">Updated_at</th>
@@ -124,6 +126,11 @@
                 });
             });
             
+            $('#search_input_btn').click(function(){
+                $('#search_form').submit();
+            });
+
+
         $( ".content-imagedata" ).scroll(function() {
         if ($('.content-imagedata').scrollTop() >=  ($('.main-content').height()-$('.content-imagedata').height())*0.8 && !$( ".content-imagedata" ).hasClass('lazy-loading')){
             $( ".content-imagedata" ).addClass('lazy-loading');
@@ -149,6 +156,7 @@
             
         }
     });
+
     });
 </script>
 @stop

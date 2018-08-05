@@ -42,7 +42,6 @@ Route::post('image/destroy', 'ImageController@destroy');
 
 //tags_page
 Route::get('tags','TagController@index');
-Route::get('tags_search','TagController@search');
 
 Route::get('tags_add_create', 'TagController@create');
 

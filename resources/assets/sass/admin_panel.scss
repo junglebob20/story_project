@@ -64,6 +64,8 @@
             .form-group{
               display: flex;
               flex-direction: row;
+              align-items: center;
+              justify-content: center;
               label{
                 display: flex;
                 justify-content: center;
@@ -109,9 +111,31 @@
                 justify-content: center;
                 align-items: center;
                 .uploaded-image{
+                  position: relative;
+                  z-index: 1;
                   img{
                     width: 128px;
                     height: 128px;
+                  }
+                  .uploaded-image-delete{
+                    position: absolute;
+                    top: -10px;
+                    z-index: 2;
+                    right: -8px;
+                    width: 20px;
+                    height: 20px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    background: #6b0b0b;
+                    border-radius: 50%;
+                    border: 1px solid #fff;
+                    cursor: pointer;
+                    .fa{
+                      margin-bottom: 1px;
+                      color: #fff;
+                      font-size: 15px;
+                    }
                   }
                 }
               }
@@ -123,6 +147,9 @@
                 .tags_container{
                   border: 1px solid rgba(0,0,0,.15);
                   border-radius: .25rem;
+                }
+                .select2-results__option--highlighted{
+                  display: none;
                 }
                 .select2-selection__choice{
                   background-color: #e4e4e4;
@@ -453,6 +480,29 @@
             padding: 10px 20px;
             margin-bottom: 1rem;
             form{
+              .input-group{
+                .input-group-append{
+                  margin-left: -1px;
+                  cursor: pointer;
+                  .input-group-text{
+                    display: flex;
+                    align-items: center;
+                    padding: .375rem .75rem;
+                    margin-bottom: 0;
+                    font-size: 1rem;
+                    font-weight: 400;
+                    line-height: 1.5;
+                    color: #495057;
+                    text-align: center;
+                    white-space: nowrap;
+                    background-color: #e9ecef;
+                    border: 1px solid #ced4da;
+                    border-radius: .25rem;
+                    border-top-left-radius: 0;
+                    border-top-right-radius: 0;
+                  }
+                }
+              }
               .form-group{
                 display: flex;
                 flex-direction: row;

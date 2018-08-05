@@ -26,15 +26,24 @@ class TagController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        if(Auth::check()){
-            return view('pages.tags', [
-                'items' => $this->tags->getModel()->limit(10)->get(),
-                'sortColumn' => ['created_at','asc']
-            ]);
+        $query=$request->q;
+        $this->query=$this->tags->getModel()->newQuery();
+        if($request->q){
+            $this->query->where('name', 'LIKE', '%'.$query.'%')->orWhere('id', 'LIKE', '%'.$query.'%')->orWhere('id', 'LIKE', '%'.$query.'%');
         }
-        return redirect('login');
+        if($request->order && $request->order_t){
+            
+            $this->query->orderBy($request->order,$request->order_t)->limit(10);
+            $sortColumn=[$request->order,$request->order_t];
+        }else{
+            $this->query->limit(10);
+            $sortColumn=['created_at','asc'];
+        }
+        $items=$this->query->get();
+        $fullLink=$request->fullUrl();
+        return view('pages.tags', compact('items', 'query','sortColumn','fullLink'));
     }
 
     /**
@@ -75,7 +84,7 @@ class TagController extends Controller
     protected function getValidator(Request $request)
     {
         $rules = [
-            'name' => 'required|max:255'
+            'name' => 'required|max:255|unique:tags'
         ];
 
         return Validator::make($request->all(), $rules);
@@ -97,9 +106,10 @@ class TagController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function search(Request $request){
-
-            return $this->tags->getModel()->where('name', 'LIKE', '%'.$request->name.'%')->select('id', 'name as text')->get();
-
+            $query=$request->q;
+            $uri = $request->fullUrl();
+            $items=$this->tags->getModel()->where('name', 'LIKE', '%'.$query.'%')->orWhere('id', 'LIKE', '%'.$query.'%')->orWhere('id', 'LIKE', '%'.$query.'%')->get();
+            return view('pages.tags', compact('items', 'query'));
     }
     public function deleteForm($id){
         return '<div class="modal" id="modal-open-delete-tag" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog" role="document"> <div class="modal-content"> <form id="delete-form" action="/tags_delete/'.$id.'" method="post"> <div class="modal-header"> <h5 class="modal-title">Delete tag</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">×</span> </button> </div><div class="modal-footer"> <button type="submit" class="btn btn-primary">Submit</button> <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> </div><input type="hidden" name="_token" value="'.csrf_token().'"> </form> </div></div></div>';

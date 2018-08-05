@@ -11,20 +11,18 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <div class="img-uploader" id="img-uploader" style="display:none;">
-                                <div class="uploaded-image">
-                                    
-                                </div>
+                            <div class="img-uploader" id="img-uploader">
+                            
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="btn col-5">Image:</label>
-                            <label for="addimage_btn" class="form-control btn col-6 select-image">Choose image</label>
-                            <input style="display:none;" name="image" type="file" class="form-control-file" id="addimage_btn">
+                            <label class="btn col-4">Image:</label>
+                            <label for="addimage_btn" class="form-control btn col-7 select-image">Choose image</label>
+                            <input style="display:none;" name="image" type="file" accept="image/*" class="form-control-file" id="addimage_btn">
                         </div>
                         <div class="form-group">
-                            <label for="tag_add" class="btn col-5">Tags:</label>
-                            <div class="tags_selector col-6">
+                            <label for="tag_add" class="btn col-4">Tags:</label>
+                            <div class="tags_selector col-7">
                                 <select id="add_tags_select" class="form-control" name="tags[]" multiple="multiple">
 
                                 </select>
@@ -41,29 +39,27 @@
         </div>
     </div>
     <script>
-        $('input[name="image"]').change(function(){
-            var urlAjax="image/thumbnail";
-            var data=$('#addImage_form').serialize();
-            console.log(data);
-            $.ajax({
-                    url: urlAjax,
-                    type: 'post',
-                    enctype: 'multipart/form-data',
-                    data: data,
-                    dataType : 'json',
-                    processData: false,
-                    contentType: false,
-                    success: function(data, textStatus, jqXHR)
-                    {
-                        /*$('#img-uploader > div.uploaded-image').append(data);*/
-                        console.log(data);
-                        $('#img-uploader').show();
-                    },
-                    error: function(jqXHR, textStatus, errorThrown)
-                    {
-                        console.log("Error");
-                    }
-                });
+        $('#addimage_btn').change(function(){
+            var input=$(this)[0];
+            if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        if($('#img-uploader > div.uploaded-image').length>0){
+                            $('#img-uploader > div.uploaded-image > img').replaceWith('<img src="'+e.target.result+'" alt="Selected Image">');
+                        }else{
+                            $('#img-uploader').append('<div class="uploaded-image"><img src="'+e.target.result+'" alt="Selected Image"><div class="uploaded-image-delete"><i class="fa fa-trash" aria-hidden="true"></i></div></div>');
+                        }
+                    };
+
+                    reader.readAsDataURL(input.files[0]);
+                }     
+        });
+        $('#addImage_form').on('click', '.uploaded-image-delete', function() {
+                var btn=$(this);
+             console.log('32');
+             btn.parent().remove();
+             $("#addimage_btn").val("");
         });
             $("#add_tags_select").select2({
             tags: true,
@@ -93,7 +89,7 @@
 <div class="modal" id="modal-open-edit-image" tabindex="-1" role="dialog" style="display: none;" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form id="edit-form" action="{{ url('image/update') }}" method="post" enctype="multipart/form-data">
+            <form id="edit-form" action="{{url('image/add')}}" method="post" enctype="multipart/form-data" enctype="multipart/form-data">
                 <div class="modal-header">
                     <h5 class="modal-title">Edit Image</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -105,29 +101,32 @@
                         <div class="img-uploader" id="img-uploader-edit">
                             <div class="uploaded-image">
                                 <img src="{{ asset($item->path.'/'.$item->name.'.'.$item->ext) }}" alt="{{$item->name}}">
+                                <div class="uploaded-image-delete"><i class="fa fa-trash" aria-hidden="true"></i></div>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="btn col-5">Image:</label>
-                        <label for="addimage_btn" class="form-control btn col-6 select-image">Choose image</label>
+                        <label class="btn col-4">Image:</label>
+                        <label for="addimage_btn" class="form-control btn col-7 select-image">Choose image</label>
                         <input style="display:none;" name="image" type="file" class="form-control-file" id="addimage_btn">
                     </div>
                     <div class="form-group">
-                        <label for="edit_tags_select" class="btn col-5">Tags:</label>
-                        <div class="tags_selector col-6">
+                        <label for="edit_tags_select" class="btn col-4">Tags:</label>
+                        <div class="tags_selector col-7">
                             <select id="edit_tags_select" class="form-control" name="tags[]" multiple="multiple">
                                 @foreach($item->tags as $k => $tag)
-                                <option selected="selected" value="{{$tag->id}}">{{$tag->name}}</option>
+                                <option selected="selected" value="{{$tag->tag_id}}">{{$tag->name}}</option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
+                    <div class="alert alert-danger" id="edit_form_error" style="display:none;"role="alert"></div>
                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="id" value="{{$item->id}}">
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    
+                    <button type="submit" id="edit_submit" class="btn btn-primary">Submit</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </form>
@@ -135,6 +134,41 @@
     </div>
 </div>
 <script>
+        $(document).ready(function () {
+    $('#edit_submit').click(function(e){
+        e.preventDefault();
+        if($('#img-uploader-edit > div.uploaded-image').length<=0){
+            $('#edit_form_error').append('<li>'+'Field Image is required'+'</li>');
+        }
+        if($('#edit-form > div.modal-body > div:nth-child(3) > div > span > span.selection > span > ul > li').length<=1){
+            $('#edit_form_error').append('<li>'+'Field Tags is required'+'</li>');
+        }
+        if($('#edit_form_error > li').length>0){
+            $('#edit_form_error').show();
+        }
+    });
+            $('#addimage_btn').change(function(){
+            var input=$(this)[0];
+            if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        if($('#img-uploader-edit > div.uploaded-image').length>0){
+                            $('#img-uploader-edit > div.uploaded-image > img').replaceWith('<img src="'+e.target.result+'" alt="Selected Image">');
+                        }else{
+                            $('#img-uploader-edit').append('<div class="uploaded-image"><img src="'+e.target.result+'" alt="Selected Image"><div class="uploaded-image-delete"><i class="fa fa-trash" aria-hidden="true"></i></div></div>');
+                        }
+                    };
+
+                    reader.readAsDataURL(input.files[0]);
+                }     
+        });
+        $('#edit-form').on('click', '.uploaded-image-delete', function() {
+                var btn=$(this);
+             console.log('32');
+             btn.parent().remove();
+             $("#addimage_btn").val("");
+        });
             $("#edit_tags_select").select2({
             tags: true,
             placeholder: "Select a tags",
@@ -158,6 +192,7 @@
                     }
                 }
         });
+    });
 </script>
 @elseif ($modal=='delete_image')
 <div class="modal" id="modal-open-delete-image" tabindex="-1" role="dialog" aria-hidden="true">
