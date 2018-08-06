@@ -78,6 +78,7 @@
                     },
                     processResults: function(data)
                     {
+                        console.log(data);
                         return {
                             results: data
                         };
@@ -89,7 +90,7 @@
 <div class="modal" id="modal-open-edit-image" tabindex="-1" role="dialog" style="display: none;" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form id="edit-form" action="{{url('image/add')}}" method="post" enctype="multipart/form-data" enctype="multipart/form-data">
+            <form id="edit-form" action="{{url('image/update')}}" method="post" enctype="multipart/form-data">
                 <div class="modal-header">
                     <h5 class="modal-title">Edit Image</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -145,6 +146,8 @@
         }
         if($('#edit_form_error > li').length>0){
             $('#edit_form_error').show();
+        }else{
+            $('#edit-form').submit();
         }
     });
             $('#addimage_btn').change(function(){
@@ -215,4 +218,36 @@
             </div>
         </div>
     </div>
+@elseif ($modal=='item_source')
+    @if(count($items)>0)
+        @foreach($items as $k=>$item)
+        <tr>
+                <th scope="row">{{$item->id}}</th>
+                <td>
+                    <img data-toggle="modal" data-target="#modal-open-img" class="img-item" src="{{ asset($item->path.'/'.$item->name.'.'.$item->ext) }}" alt="{{ $item->name }}">
+                </td>
+                <td>{{ $item->name }}</td>
+                <td>
+                    <div class="tags-wrapper">
+                        @foreach($item->tags as $k=>$tag)
+                            <div class="tag-wrap">
+                                <span id="unclickable-label" class="aui-label">{{$tag->name}}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                </td>
+                <td class="col-action">
+                    <div class="support-btns">
+                        <button type="button" class="btn btn-primary tag-edit" data-id="{{$item->id}}">
+                            <i class="fa fa-pencil" aria-hidden="true"></i>Edit</button>
+                        <button type="button" class="btn btn-primary tag-delete" data-id="{{$item->id}}">
+                            <i class="fa fa-trash" aria-hidden="true"></i>Delete</button>
+                            <button type="button" class="btn btn-primary image-download" data-id="{{$item->id}}">
+                                    <a href="{{asset($item->path.'/'.$item->name.'.'.$item->ext)}}" download></a>
+                                <i class="fa fa-download" aria-hidden="true"></i>Download</button>
+                    </div>
+                </td>
+            </tr>
+        @endforeach
+    @endif
 @endif

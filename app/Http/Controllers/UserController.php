@@ -33,14 +33,23 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        if(Auth::check()){
-            return view('pages.users_list', [
-                'items' => $this->users->all()
-            ]);
+        $query=$request->q;
+        $this->query=$this->users->getModel()->newQuery();
+        if($request->q){
+            $this->query->where('username', 'LIKE', '%'.$query.'%')->orWhere('id', 'LIKE', '%'.$query.'%')->orWhere('role', 'LIKE', '%'.$query.'%');
         }
-        return redirect('login');
+        if($request->sort && $request->order){
+            
+            $this->query->orderBy($request->sort,$request->order)->limit(10);
+            $sortColumn=[$request->sort,$request->order];
+        }else{
+            $sortColumn=['created_at','desc'];
+            $this->query->orderBy($sortColumn[0],$sortColumn[1])->limit(10);
+        }
+        $items=$this->query->get();
+        return view('pages.users_list', compact('items', 'query','sortColumn','request'));
     }
     /**
      * Show the form for creating a new resource.
@@ -175,5 +184,32 @@ class UserController extends Controller
         }else{
             return back()->with('fail','User Deleted failed');
         }
+    }
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function lazyLoading(Request $request)
+    {
+        $query=$request->q;
+        $this->query=$this->users->getModel()->newQuery();
+        if($request->q){
+            $this->query->where('username', 'LIKE', '%'.$query.'%')->orWhere('id', 'LIKE', '%'.$query.'%')->orWhere('role', 'LIKE', '%'.$query.'%');
+        }
+        if($request->sort && $request->order){
+            $this->query->orderBy($request->sort,$request->order);
+        }else{
+            $sortColumn=['created_at','desc'];
+            $this->query->orderBy($sortColumn[0],$sortColumn[1]);
+        }
+        if($request->offset){
+            $this->query->offset($request->offset)->limit(10);
+        }
+        $items=$this->query->get();
+        return view('pages.users_list_modal',[
+            'modal' => 'item_source',
+            'items' => $items
+        ]);
     }
 }

@@ -31,19 +31,18 @@ class TagController extends Controller
         $query=$request->q;
         $this->query=$this->tags->getModel()->newQuery();
         if($request->q){
-            $this->query->where('name', 'LIKE', '%'.$query.'%')->orWhere('id', 'LIKE', '%'.$query.'%')->orWhere('id', 'LIKE', '%'.$query.'%');
+            $this->query->where('name', 'LIKE', '%'.$query.'%')->orWhere('id', 'LIKE', '%'.$query.'%');
         }
         if($request->sort && $request->order){
-            
             $this->query->orderBy($request->sort,$request->order)->limit(10);
             $sortColumn=[$request->sort,$request->order];
         }else{
-            $this->query->limit(10);
-            $sortColumn=['created_at','asc'];
+            $sortColumn=['created_at','desc'];
+            $this->query->orderBy($sortColumn[0],$sortColumn[1])->limit(10);
         }
         $items=$this->query->get();
         $fullLink=$request->fullUrl();
-        return view('pages.tags', compact('items', 'query','sortColumn','fullLink'));
+        return view('pages.tags', compact('items', 'query','sortColumn','request'));
     }
 
     /**
@@ -106,10 +105,9 @@ class TagController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function search(Request $request){
-            $query=$request->q;
-            $uri = $request->fullUrl();
-            $items=$this->tags->getModel()->where('name', 'LIKE', '%'.$query.'%')->orWhere('id', 'LIKE', '%'.$query.'%')->orWhere('id', 'LIKE', '%'.$query.'%')->get();
-            return view('pages.tags', compact('items', 'query'));
+            $query=$request->name;
+            $items=$this->tags->getModel()->where('name', 'LIKE', '%'.$query.'%')->select('id', 'name as text')->get();
+            return $items;
     }
     public function deleteForm($id){
         return '<div class="modal" id="modal-open-delete-tag" tabindex="-1" role="dialog" aria-hidden="true"> <div class="modal-dialog" role="document"> <div class="modal-content"> <form id="delete-form" action="/tags_delete/'.$id.'" method="post"> <div class="modal-header"> <h5 class="modal-title">Delete tag</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">×</span> </button> </div><div class="modal-footer"> <button type="submit" class="btn btn-primary">Submit</button> <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> </div><input type="hidden" name="_token" value="'.csrf_token().'"> </form> </div></div></div>';
@@ -164,6 +162,21 @@ class TagController extends Controller
      */
     public function lazyLoading(Request $request)
     {
-        return $this->tags->getModel()->offset($request->offset)->limit(10)->get();
+        $query=$request->q;
+        $this->query=$this->tags->getModel()->newQuery();
+        if($request->q){
+            $this->query->where('name', 'LIKE', '%'.$query.'%')->orWhere('id', 'LIKE', '%'.$query.'%');
+        }
+        if($request->sort && $request->order){ 
+            $this->query->orderBy($request->sort,$request->order);
+        }else{
+            $sortColumn=['created_at','desc'];
+            $this->query->orderBy($sortColumn[0],$sortColumn[1]);
+        }
+        if($request->offset){
+            $this->query->offset($request->offset)->limit(10);
+        }
+        $items=$this->query->get();
+        return $items;
     }
 }

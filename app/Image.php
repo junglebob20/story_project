@@ -18,4 +18,5 @@ class Image extends Model
     {
         return $this->belongsToMany(Tag::Class, 'image_tags', 'image_id', 'tag_id');
     }
+    public $sortable = ['id','name'];
 }

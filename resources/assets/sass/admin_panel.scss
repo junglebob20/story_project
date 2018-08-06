@@ -325,10 +325,6 @@
         }
         .modal-open-user{
           overflow: visible!important;
-          .user-name{
-            background: #fff;
-            color: #000;
-          }
           .user-modal{
             display: block!important;
           }
@@ -349,8 +345,8 @@
             background: #fff;
             color: #000;
             top: 100%;
-            right: 0;
-            left: 0;
+            right: -10px;
+            left: auto;
             bottom: auto;
             padding: 0;
             border: 1px solid rgba(0, 0, 0, 0.15);
@@ -358,6 +354,7 @@
             border-top-left-radius: 0;
             border-top-right-radius: 0;
             border-top: none;
+            width: 95px;
             cursor: pointer;
             .user-modal-wrapper{
               display: flex;
@@ -392,7 +389,7 @@
         .main-tabs{
           background-color: #1d1d1d;
           border-right: 1px solid #263340;
-          min-width: 275px;
+          min-width: 215px;
           .nav{
             flex-direction: column;
             .nav-link{
@@ -428,6 +425,10 @@
           display: flex;
           flex-direction: column;
           padding: 15px;
+          /*display: grid;
+          grid-template-columns: 80% 20%;
+          grid-template-rows: min-content min-content min-content;
+          grid-template-areas: 'addimage addimage' 'search search' 'imagedata right';*/
           .content-addimage{
             padding: 10px 20px;
             display: flex;
@@ -438,6 +439,7 @@
             margin-bottom: 1rem;
             border: 1px solid rgba(0, 0, 0, 0.15);
             border-radius: .25rem;
+            /*grid-area: addimage;*/
             .image-status{
               display: flex;
               font-size: 18px;
@@ -475,11 +477,24 @@
             border-radius: .25rem;
             padding: 10px 20px;
             margin-bottom: 1rem;
+            /*grid-area: search;*/
             form{
               .input-group{
                 .input-group-append{
                   margin-left: -1px;
                   cursor: pointer;
+                  &:hover,&:active{
+                    .input-group-text{
+                      color: #000;
+                      background-color: #fff;
+                      border-color: #343a40;
+                    }
+                  }
+                  &:focus{
+                    .input-group-text{
+                      box-shadow: 0 0 0 0.2rem rgba(52,58,64,.5);
+                    }
+                  }
                   .input-group-text{
                     display: flex;
                     align-items: center;
@@ -493,9 +508,10 @@
                     white-space: nowrap;
                     background-color: #e9ecef;
                     border: 1px solid #ced4da;
-                    border-radius: .25rem;
-                    border-top-left-radius: 0;
-                    border-top-right-radius: 0;
+                    background: #1d1d1d;
+                    color: #fff;
+                    border-color: transparent;
+                    border-radius: 0 .25rem .25rem 0;
                   }
                 }
               }
@@ -520,7 +536,13 @@
           .content-imagedata{
             overflow: auto;
             margin-bottom: 30px;
+            /*grid-area: imagedata;*/
             .table{
+              tr{
+                &:nth-child(even){
+                  background: #f9f9f9;
+                }
+              }
               td,th{
                 text-align: center;
               }
@@ -554,7 +576,7 @@
                 }
               }
               .col-action{
-                vertical-align: top;
+                vertical-align: middle;
                 .support-btns{
                   display: flex;
                   flex-direction: column;
@@ -567,6 +589,7 @@
                     min-width: 97px;
                     border-color: transparent;
                     display: flex;
+                    position: relative;
                     &:last-child{
                       margin-bottom: 0;
                     }
@@ -583,13 +606,26 @@
                     &:focus{
                       box-shadow: 0 0 0 0.2rem rgba(52,58,64,.5);
                     }
+                    a{
+                      color: #fff;
+                      text-decoration: none;
+                      position: absolute;
+                      top: 0;
+                      left: 0;
+                      right: 0;
+                      bottom: 0;
+                    }
                     .fa{
                       margin-right: 5px;
+                      margin-top: 1px;
                     }
                   }
                 }
               }
             }
+          }
+          .content-right{
+            /*grid-area: right;*/
           }
         }
       }

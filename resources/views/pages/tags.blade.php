@@ -64,99 +64,100 @@
 </div>
 @endif
 <script>
-    function clickEventInit(){
-        $('.tag-edit').click(function(e){
-                var btn=$(this);
-                $.ajax({
-                    url: "tag_edit_form/"+btn.data('id'),
-                    type: 'get',
-                    success: function(data, textStatus, jqXHR)
-                    {
-                        $('body').append(data);
-                        $('#modal-open-edit-tag').modal('show');
-                        $('#modal-open-edit-tag').on('hide.bs.modal', function (e) {
-                            $('#modal-open-edit-tag').remove();
-                        });
-                    },
-                    error: function(jqXHR, textStatus, errorThrown)
-                    {
-                        console.log("Error");
-                    }
-                });
-            });
-        $('.tag-delete').click(function(e){
-            var btn=$(this);
-            var urlAjax="tag/"+btn.data('id')+"/deleteForm";
-            console.log(urlAjax);
-                $.ajax({
-                    url: urlAjax,
-                    type: 'get',
-                    success: function(data, textStatus, jqXHR)
-                    {
-                        $('body').append(data);
-                        $('#modal-open-delete-tag').modal('show');
-                        $('#modal-open-delete-tag').on('hide.bs.modal', function (e) {
-                            $('#modal-open-delete-tag').remove();
-                        });
-                    },
-                    error: function(jqXHR, textStatus, errorThrown)
-                    {
-                        console.log("Error");
-                    }
-                });
-        });
-    }
-    $(document).ready(function(){
-        clickEventInit();
-            $('#modal-open-add-tag-btn').click(function(e){
-                $.ajax({
-                    url: "tags_add_create",
-                    type: 'get',
-                    success: function(data, textStatus, jqXHR)
-                    {
-                        $('body').append(data);
-                        $('#modal-open-add-tag').modal('show');
-                        $('#modal-open-add-tag').on('hide.bs.modal', function (e) {
-                            $('#modal-open-add-tag').remove();
-                        });
-                    },
-                    error: function(jqXHR, textStatus, errorThrown)
-                    {
-                        console.log("Error");
-                    }
-                });
-            });
-            
-            $('#search_input_btn').click(function(){
-                $('#search_form').submit();
-            });
-
-
-        $( ".content-imagedata" ).scroll(function() {
-        if ($('.content-imagedata').scrollTop() >=  ($('.main-content').height()-$('.content-imagedata').height())*0.8 && !$( ".content-imagedata" ).hasClass('lazy-loading')){
-            $( ".content-imagedata" ).addClass('lazy-loading');
-            var offset=$('.content-imagedata > table > tbody > tr').length;
+    $(document).ready(function () {
+        $('.content-imagedata').on('click', '.tag-edit', function (e) {
+            var btn = $(this);
             $.ajax({
+                url: "tag_edit_form/" + btn.data('id'),
+                type: 'get',
+                success: function (data, textStatus, jqXHR) {
+                    $('body').append(data);
+                    $('#modal-open-edit-tag').modal('show');
+                    $('#modal-open-edit-tag').on('hide.bs.modal', function (e) {
+                        $('#modal-open-edit-tag').remove();
+                    });
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log("Error");
+                }
+            });
+        });
+        $('.content-imagedata').on('click', '.tag-delete', function (e) {
+            var btn = $(this);
+            var urlAjax = "tag/" + btn.data('id') + "/deleteForm";
+            console.log(urlAjax);
+            $.ajax({
+                url: urlAjax,
+                type: 'get',
+                success: function (data, textStatus, jqXHR) {
+                    $('body').append(data);
+                    $('#modal-open-delete-tag').modal('show');
+                    $('#modal-open-delete-tag').on('hide.bs.modal', function (e) {
+                        $('#modal-open-delete-tag').remove();
+                    });
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log("Error");
+                }
+            });
+        });
+        $('#modal-open-add-tag-btn').click(function (e) {
+            $.ajax({
+                url: "tags_add_create",
+                type: 'get',
+                success: function (data, textStatus, jqXHR) {
+                    $('body').append(data);
+                    $('#modal-open-add-tag').modal('show');
+                    $('#modal-open-add-tag').on('hide.bs.modal', function (e) {
+                        $('#modal-open-add-tag').remove();
+                    });
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log("Error");
+                }
+            });
+        });
+
+        $('#search_input_btn').click(function () {
+            $('#search_form').submit();
+        });
+
+
+        $(".content-imagedata").scroll(function () {
+            var position = $('.content-imagedata').scrollTop();
+            var bottom = $('.content-imagedata').outerHeight();
+            var scrollHeight = $(".content-imagedata")[0].scrollHeight;
+            if (position + bottom == scrollHeight) {
+                var offset = $('.content-imagedata > table > tbody > tr').length;
+                $(".content-imagedata").addClass('lazy-loading');
+                $.ajax({
                     url: "tags_loading",
                     type: 'post',
-                    data:{offset:offset,_token:'{{ csrf_token() }}'},
-                    success: function(data)
-                    {
-                        
-                        data.forEach(function(item){
-                            jQuery('div.content-imagedata > table > tbody').append('<tr><th scope="row">'+item.id+'</th><td>'+item.name+'</td><td>'+item.created_at+'</td><td>'+item.updated_at+'</td><td class="col-action"><div class="support-btns"><button type="button" data-id="'+item.id+'" data-toggle="modal" class="btn btn-primary tag-edit"><i class="fa fa-pencil" aria-hidden="true"></i>Edit</button><button type="button" data-id="'+item.id+'" class="btn btn-primary tag-delete"><i class="fa fa-trash" aria-hidden="true"></i>Delete</button></div></td></tr>');
+                    data: {
+                        @if($request->q)
+                            q:'{{$request->q}}',
+                        @endif
+                        @if($request->sort && $request->order)
+                            sort:'{{$request->sort}}',
+                            order:'{{$request->order}}',
+                        @endif
+                        offset: offset,
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function (data) {
+
+                        data.forEach(function (item) {
+                            $('div.content-imagedata > table > tbody').append('<tr><th scope="row">' + item.id + '</th><td>' + item.name + '</td><td>' + item.created_at + '</td><td>' + item.updated_at + '</td><td class="col-action"><div class="support-btns"><button type="button" data-id="' + item.id + '" data-toggle="modal" class="btn btn-primary tag-edit"><i class="fa fa-pencil" aria-hidden="true"></i>Edit</button><button type="button" data-id="' + item.id + '" class="btn btn-primary tag-delete"><i class="fa fa-trash" aria-hidden="true"></i>Delete</button></div></td></tr>');
                         });
 
-                        $( ".content-imagedata" ).removeClass('lazy-loading');
+                        $(".content-imagedata").removeClass('lazy-loading');
                     },
-                    error: function()
-                    {
+                    error: function () {
                         console.log("Error");
                     }
-            });
-            
-        }
-    });
+                });
+            }
+        });
 
     });
 </script>

@@ -19,11 +19,13 @@
     <i class="fa fa-plus-circle" aria-hidden="true"></i>Add new user</button>
 </div>
 <div class="content-search">
-  <form action="">
-    <div class="form-group">
-      <label for="search_input">Search:</label>
-      <input type="text" class="form-control" id="search_input" placeholder="Search">
-    </div>
+  <form id="search_form" action="{{url('userslist')}}" method="GET">
+    <div class="input-group">
+        <input type="text" class="form-control" placeholder="Search" name="q" aria-label="Search" aria-describedby="basic-addon2" value="{{$query or ''}}">
+        <div id="search_input_btn" class="input-group-append">
+            <span class="input-group-text" id="basic-addon2">Search</span>
+        </div>
+    </div> 
   </form>
 </div>
 @if (count($items)>0)
@@ -31,11 +33,11 @@
   <table class="table">
     <thead>
       <tr>
-        <th scope="col" class="table-col">Id</th>
-        <th scope="col" class="table-col">Username</th>
-        <th scope="col" class="table-col">Role</th>
-        <th scope="col" class="table-col">Created_at</th>
-        <th scope="col" class="table-col">Updated_at</th>
+        <th scope="col" class="table-col">@sortablelink('id')</th>
+        <th scope="col" class="table-col">@sortablelink('username')</th>
+        <th scope="col" class="table-col">@sortablelink('role')</th>
+        <th scope="col" class="table-col">@sortablelink('created_at')</th>
+        <th scope="col" class="table-col">@sortablelink('updated_at')</th>
         <th scope="col" class="table-col">Action</th>
       </tr>
     </thead>
@@ -62,66 +64,92 @@
 </div>
 @endif
 <script>
-  $(document).ready(function(){
-      $('.user-edit').click(function(e){
-        var btn=$(this);
-            var urlAjax="user/"+btn.data('id')+"/edit";
-            console.log(urlAjax);
-                $.ajax({
-                    url: urlAjax,
-                    type: 'get',
-                    success: function(data, textStatus, jqXHR)
-                    {
-                        $('body').append(data);
-                        $('#modal-open-edit-user').modal('show');
-                        $('#modal-open-edit-user').on('hide.bs.modal', function (e) {
-                            $('#modal-open-edit-user').remove();
-                        });
-                    },
-                    error: function(jqXHR, textStatus, errorThrown)
-                    {
-                        console.log("Error");
-                    }
-                });
+  $(document).ready(function () {
+    $('.content-imagedata').on('click', '.user-edit', function (e) {
+          var btn = $(this);
+          var urlAjax = "user/" + btn.data('id') + "/edit";
+          console.log(urlAjax);
+          $.ajax({
+              url: urlAjax,
+              type: 'get',
+              success: function (data, textStatus, jqXHR) {
+                  $('body').append(data);
+                  $('#modal-open-edit-user').modal('show');
+                  $('#modal-open-edit-user').on('hide.bs.modal', function (e) {
+                      $('#modal-open-edit-user').remove();
+                  });
+              },
+              error: function (jqXHR, textStatus, errorThrown) {
+                  console.log("Error");
+              }
           });
-      $('.user-delete').click(function(e){
-        var btn=$(this);
-        var urlAjax="user/"+btn.data('id')+"/delete";
-                $.ajax({
-                    url: urlAjax,
-                    type: 'get',
-                    success: function(data, textStatus, jqXHR)
-                    {
-                        $('body').append(data);
-                        $('#modal-open-delete-user').modal('show');
-                        $('#modal-open-delete-user').on('hide.bs.modal', function (e) {
-                            $('#modal-open-delete-user').remove();
-                        });
-                    },
-                    error: function(jqXHR, textStatus, errorThrown)
-                    {
-                        console.log("Error");
-                    }
-                });
       });
-      $('#modal-open-add-user-btn').click(function(e){
+      $('.content-imagedata').on('click', '.user-delete', function (e) {
+          var btn = $(this);
+          var urlAjax = "user/" + btn.data('id') + "/delete";
+          $.ajax({
+              url: urlAjax,
+              type: 'get',
+              success: function (data, textStatus, jqXHR) {
+                  $('body').append(data);
+                  $('#modal-open-delete-user').modal('show');
+                  $('#modal-open-delete-user').on('hide.bs.modal', function (e) {
+                      $('#modal-open-delete-user').remove();
+                  });
+              },
+              error: function (jqXHR, textStatus, errorThrown) {
+                  console.log("Error");
+              }
+          });
+      });
+      $('#modal-open-add-user-btn').click(function (e) {
+          $.ajax({
+              url: "user/add",
+              type: 'get',
+              success: function (data, textStatus, jqXHR) {
+                  $('body').append(data);
+                  $('#modal-open-add-user').modal('show');
+                  $('#modal-open-add-user').on('hide.bs.modal', function (e) {
+                      $('#modal-open-add-user').remove();
+                  });
+              },
+              error: function (jqXHR, textStatus, errorThrown) {
+                  console.log("Error");
+              }
+          });
+      });
+      $(".content-imagedata").scroll(function () {
+            var position = $('.content-imagedata').scrollTop();
+            var bottom = $('.content-imagedata').outerHeight();
+            var scrollHeight = $(".content-imagedata")[0].scrollHeight;
+            if (position + bottom == scrollHeight) {
+                var offset = $('.content-imagedata > table > tbody > tr').length;
+                $(".content-imagedata").addClass('lazy-loading');
                 $.ajax({
-                    url: "user/add",
-                    type: 'get',
-                    success: function(data, textStatus, jqXHR)
-                    {
-                        $('body').append(data);
-                        $('#modal-open-add-user').modal('show');
-                        $('#modal-open-add-user').on('hide.bs.modal', function (e) {
-                            $('#modal-open-add-user').remove();
-                        });
+                    url: "userslist_loading",
+                    type: 'post',
+                    data: {
+                        @if($request->q)
+                            q:'{{$request->q}}',
+                        @endif
+                        @if($request->sort && $request->order)
+                            sort:'{{$request->sort}}',
+                            order:'{{$request->order}}',
+                        @endif
+                        offset: offset,
+                        _token: '{{ csrf_token() }}'
                     },
-                    error: function(jqXHR, textStatus, errorThrown)
-                    {
+                    success: function (data) {
+                        $('div.content-imagedata > table > tbody').append(data).show().fadeIn("slow");
+
+                        $(".content-imagedata").removeClass('lazy-loading');
+                    },
+                    error: function () {
                         console.log("Error");
                     }
                 });
-            });
+            }
+        });
   });
 </script> 
 @stop

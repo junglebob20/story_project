@@ -20,57 +20,62 @@ Route::get('/', function () {
 
 //login_page
 Route::get('login', 'LoginController@show');
-Route::get('logincheck', 'LoginController@log_in');
+Route::post('logincheck', 'LoginController@log_in');
 Route::get('logout', 'LoginController@logout');
 
 //dashboard_page
-Route::get('dashboard', 'DashboardController@index');
+Route::get('dashboard', 'DashboardController@index')->middleware('user');
 
 //images_page
-Route::get('images','ImageController@index');
+Route::get('images','ImageController@index')->middleware('user');
 
-Route::get('image/add', 'ImageController@create');
-Route::post('image/thumbnail', 'ImageController@thumbnail');
-Route::post('image/add', 'ImageController@store');
+Route::get('test_img','ImageController@test')->middleware('user');
 
-Route::get('image/{id}/edit', 'ImageController@edit');
-Route::post('image/update', 'ImageController@update');
+Route::get('image/add', 'ImageController@create')->middleware('user');
+Route::post('image/thumbnail', 'ImageController@thumbnail')->middleware('user');
+Route::post('image/add', 'ImageController@store')->middleware('user');
 
-Route::get('image/{id}/delete', 'ImageController@delete');
-Route::post('image/destroy', 'ImageController@destroy');
+Route::get('image/{id}/edit', 'ImageController@edit')->middleware('user');
+Route::post('image/update', 'ImageController@update')->middleware('user');
 
+Route::get('image/{id}/delete', 'ImageController@delete')->middleware('user');
+Route::post('image/destroy', 'ImageController@destroy')->middleware('user');
+
+Route::post('images_loading', 'ImageController@lazyLoading')->middleware('user');
 
 //tags_page
-Route::get('tags','TagController@index');
+Route::get('tags','TagController@index')->middleware('user');
 
-Route::get('tags_add_create', 'TagController@create');
+Route::get('tags_add_create', 'TagController@create')->middleware('user');
 
-Route::get('tag/{id}/deleteForm', 'TagController@deleteForm');
+Route::get('tag/{id}/deleteForm', 'TagController@deleteForm')->middleware('user');
 
-Route::post('tags_add', 'TagController@store');
+Route::post('tags_add', 'TagController@store')->middleware('user');
 
-Route::get('tag/{id}', 'TagController@show');
+Route::get('tag/{id}', 'TagController@show')->middleware('user');
 
-Route::get('tag_edit_form/{id}', 'TagController@edit');
+Route::get('tag_edit_form/{id}', 'TagController@edit')->middleware('user');
 
-Route::post('tags_edit/{id}', 'TagController@update');
+Route::post('tags_edit/{id}', 'TagController@update')->middleware('user');
 
-Route::post('tags_delete/{id}', 'TagController@destroy');
+Route::post('tags_delete/{id}', 'TagController@destroy')->middleware('user');
 
-Route::post('tags_loading', 'TagController@lazyLoading');
-
+Route::get('tags_search', 'TagController@search')->middleware('user');
+Route::post('tags_loading', 'TagController@lazyLoading')->middleware('user');
 
 
 //users_list_page
-Route::get('userslist','UserController@index');
+Route::get('userslist','UserController@index')->middleware('admin');
 
-Route::get('user/add', 'UserController@create');
-Route::post('user/add', 'UserController@store');
+Route::get('user/add', 'UserController@create')->middleware('admin');
+Route::post('user/add', 'UserController@store')->middleware('admin');
 
-Route::get('user/{id}/edit', 'UserController@edit');
-Route::post('user/update', 'UserController@update');
+Route::get('user/{id}/edit', 'UserController@edit')->middleware('admin');
+Route::post('user/update', 'UserController@update')->middleware('admin');
 
-Route::get('user/{id}/delete', 'UserController@delete');
-Route::post('user/destroy', 'UserController@destroy');
+Route::get('user/{id}/delete', 'UserController@delete')->middleware('admin');
+Route::post('user/destroy', 'UserController@destroy')->middleware('admin');
+
+Route::post('userslist_loading', 'UserController@lazyLoading')->middleware('user');
 
 

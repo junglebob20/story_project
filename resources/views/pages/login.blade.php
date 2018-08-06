@@ -8,7 +8,7 @@
     <div class="wrapper">
         <div class="login-wrapper">
             <h1>Admin panel</h1>
-            <form id="login_form" action="{{ url('/logincheck')}}" method="get">
+            <form id="login_form" action="{{ url('/logincheck')}}" method="POST">
                 <div class="form-group">
                     <label for="login_input_username">Username</label>
                     <input type="text" class="form-control" name="username" id="login_input_username" placeholder="Username">
@@ -20,6 +20,7 @@
                 @if (session('status'))
                 <div id="login_alert_message" class="alert alert-primary" style="display:block;" role="alert">{{ session('status') }}</div>
                 @endif
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <button id="submit_form-btn" type="submit" class="btn btn-primary">Submit</button>
             </form>
         </div>

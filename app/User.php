@@ -27,4 +27,5 @@ class User extends Authenticatable
     protected $hidden = [
         'password'
     ];
+    public $sortable = ['id','username','role','created_at','updated_at'];
 }

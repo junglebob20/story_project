@@ -106,4 +106,24 @@
         </div>
     </div>
 </div>
+@elseif ($modal=='item_source')
+    @if(count($items)>0)
+        @foreach($items as $k=>$item)
+            <tr>
+            <th scope="row">{{$item->id}}</th>
+            <td>{{$item->username}}</td>
+            <td>{{$item->role}}</td>
+            <td>{{$item->created_at}}</td>
+            <td>{{$item->updated_at}}</td>
+            <td class="col-action">
+                <div class="support-btns">
+                <button type="button" data-id="{{ $item->id }}" class="btn btn-primary user-edit">
+                    <i class="fa fa-pencil" aria-hidden="true"></i>Edit</button>
+                <button type="button" data-id="{{ $item->id }}" class="btn btn-primary user-delete" >
+                    <i class="fa fa-trash" aria-hidden="true"></i>Delete</button>
+                </div>
+            </td>
+            </tr>
+        @endforeach
+    @endif
 @endif

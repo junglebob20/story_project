@@ -30,25 +30,43 @@ class ImageController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        if(Auth::check()){
-
-            return view('pages.images', [
+        $query=$request->q;
+        $this->query=$this->images->getModel()->newQuery();
+        if($request->q){
+            $this->query->where('name', 'LIKE', '%'.$query.'%')->orWhere('id', 'LIKE', '%'.$query.'%')->orWhereHas('tags', function ($q) use ($query) {
+                $q->where('name', 'LIKE', '%'.$query.'%');
+            });
+        }
+        if($request->sort && $request->order){
+            if($request->sort=='tags'){
+                $this->query->whereHas('tags')->orderBy('name',$request->order)->limit(10);
+                $sortColumn=[$request->sort,$request->order];
+            }else{
+                $this->query->orderBy($request->sort,$request->order)->limit(10);
+                $sortColumn=[$request->sort,$request->order];
+            }
+        }else{
+            $sortColumn=['created_at','desc'];
+            $this->query->orderBy($sortColumn[0],$sortColumn[1])->limit(10);
+        }
+        $items=$this->query->get();
+        $active_page='images';
+        return view('pages.images', compact('items', 'query','sortColumn','active_page','request'));
+            /*return view('pages.images', [
                 'items' => $this->images->all(),
                 'tags' => $this->tags->all(),
                 'sortColumn' => ['created_at','asc']
-            ]);
-        }
-        return redirect('login');
+            ]);*/
     }
   /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function test(Request $request){
-        dd($request);
+    public function test(){
+        return $this->images->getModel()->whereHas('tags')->orderBy('name','asc')->get();
     }
     /**
      * Show the form for creating a new resource.
@@ -60,30 +78,6 @@ class ImageController extends Controller
         return view('pages.images_modal',[
             'modal' => 'add_image'
         ]);
-    }
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function thumbnail(Request $request)
-    {
-        $validator = $this->getValidator($request);
-        if ($validator->fails()) {
-            return back()->with('fail','Image Upload failed, please check your image');
-        }else{
-            if( $request->hasFile('image') ) {
-                $input['imageName'] = time();
-                $input['imageExt'] = $image->getClientOriginalExtension();
-                $destinationPath = public_path('storage/thumbnail_images');
-                $img = ImageManager::make($image->getRealPath());
-                if(!$this->check_imageSize($image)){
-                    $img->resize(512, 512);
-                }
-            }
-            return $img;
-        }
     }
     /**
      * Store a newly created resource in storage.
@@ -145,8 +139,38 @@ class ImageController extends Controller
     protected function getValidator(Request $request)
     {
         $rules = [
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg',
             'tags' => 'required'
+        ];
+
+        return Validator::make($request->all(), $rules);
+    }
+        /**
+     * Gets a new validator instance with the defined rules.
+     *
+     * @param Illuminate\Http\Request $request
+     *
+     * @return Illuminate\Support\Facades\Validator
+     */
+    protected function getValidatorUpdate(Request $request)
+    {
+        $rules = [
+            'tags' => 'required'
+        ];
+
+        return Validator::make($request->all(), $rules);
+    }
+    /**
+     * Gets a new validator instance with the defined rules.
+     *
+     * @param Illuminate\Http\Request $request
+     *
+     * @return Illuminate\Support\Facades\Validator
+     */
+    protected function getValidatorImage(Request $request)
+    {
+        $rules = [
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg'
         ];
 
         return Validator::make($request->all(), $rules);
@@ -213,13 +237,15 @@ class ImageController extends Controller
      */
     public function update(Request $request)
     {
-        $validator = $this->getValidator($request);
+        $validator = $this->getValidatorUpdate($request);
         
         if ($validator->fails()) {
             return back()->with('fail','Image Upload failed, please check your image');
         }else{
-            if($request->hasFile('image')) {
-                $tags=$request->input('tags');
+            if($request->image) {
+                if($this->getValidatorImage($request)->fails()){
+                    return back()->with('fail','Image Upload failed, please check your image');
+                }
                 $this->deleteImageFromStorage($request->id);
                 $image = $request->file('image');
                 $input['imageName'] = time();
@@ -236,8 +262,9 @@ class ImageController extends Controller
                     'path'=> 'storage/images/',
                     'ext'=> $input['imageExt']
                 ],$request->id);
-            }
 
+            }
+            $tags=$request->input('tags');
             $tagsToSync=array();
             foreach($tags as $k => $tag){
                 $checkedTag=$this->tags->all()->where('id',$tag)->first();
@@ -270,5 +297,32 @@ class ImageController extends Controller
         }else{
             return back()->with('fail','Image Deleted failed');
         }
+    }
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function lazyLoading(Request $request)
+    {
+        $query=$request->q;
+        $this->query=$this->images->getModel()->newQuery();
+        if($request->q){
+            $this->query->where('username', 'LIKE', '%'.$query.'%')->orWhere('id', 'LIKE', '%'.$query.'%')->orWhere('role', 'LIKE', '%'.$query.'%');
+        }
+        if($request->sort && $request->order){
+            $this->query->orderBy($request->sort,$request->order);
+        }else{
+            $sortColumn=['created_at','desc'];
+            $this->query->orderBy($sortColumn[0],$sortColumn[1]);
+        }
+        if($request->offset){
+            $this->query->offset($request->offset)->limit(10);
+        }
+        $items=$this->query->get();
+        return view('pages.images_modal',[
+            'modal' => 'item_source',
+            'items' => $items
+        ]);
     }
 }

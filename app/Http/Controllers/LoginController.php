@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\Session;
 class LoginController extends Controller
 {
     public function show(){
-        if(Auth::check()){
-            return redirect('dashboard');
-        }
         return view('pages.login');
     }
     /**
