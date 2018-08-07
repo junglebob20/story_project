@@ -11,6 +11,7 @@ use \Validator;
 use App\Image;
 use App\Tag;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 class ImageController extends Controller
 {
     protected $images;
@@ -32,11 +33,17 @@ class ImageController extends Controller
      */
     public function index(Request $request)
     {
-        $query=$request->q;
         $this->query=$this->images->getModel()->newQuery();
         if($request->q){
+            $query=$request->q;
             $this->query->where('name', 'LIKE', '%'.$query.'%')->orWhere('id', 'LIKE', '%'.$query.'%')->orWhereHas('tags', function ($q) use ($query) {
                 $q->where('name', 'LIKE', '%'.$query.'%');
+            });
+        }
+        if($request->tag_name){
+            $tag_name=$request->tag_name;
+            $this->query->wherehas('tags',function ($q) use ($tag_name){
+                $q->where('name', '=', $tag_name);
             });
         }
         if($request->sort && $request->order){
@@ -48,7 +55,13 @@ class ImageController extends Controller
         }
         $items=$this->query->get();
         $active_page='images';
-        return view('pages.images', compact('items', 'query','sortColumn','active_page','request'));
+
+        $tags=$this->tags->getModel()->join('image_tags', 'image_tags.tag_id', '=', 'tags.id')
+        ->groupBy('tags.id')
+        ->select('tags.id','tags.name',DB::raw('count(tags.id) as tag_count'))
+        ->orderBy('tag_count','desc')->get();
+
+        return view('pages.images', compact('items', 'query','sortColumn','active_page','request','tags'));
             /*return view('pages.images', [
                 'items' => $this->images->all(),
                 'tags' => $this->tags->all(),
@@ -61,7 +74,9 @@ class ImageController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function test(){
-        return $this->images->getModel()->whereHas('tags')->orderBy('name','asc')->get();
+        $toReturn=$this->tags->getModel()->join('image_tags', 'image_tags.tag_id', '=', 'tags.id')->groupBy('tags.id')->select('tags.id','tags.name',DB::raw('count(tags.id) as tag_count'))
+        ->orderBy('tag_count','desc')->get();
+        return $toReturn;
     }
     /**
      * Show the form for creating a new resource.
@@ -306,10 +321,16 @@ class ImageController extends Controller
      */
     public function lazyLoading(Request $request)
     {
-        $query=$request->q;
         $this->query=$this->images->getModel()->newQuery();
         if($request->q){
+            $query=$request->q;
             $this->query->where('username', 'LIKE', '%'.$query.'%')->orWhere('id', 'LIKE', '%'.$query.'%')->orWhere('role', 'LIKE', '%'.$query.'%');
+        }
+        if($request->tag_name){
+            $tag_name=$request->tag_name;
+            $this->query->wherehas('tags',function ($q) use ($tag_name){
+                $q->where('name', '=', $tag_name);
+            });
         }
         if($request->sort && $request->order){
             $this->query->orderBy($request->sort,$request->order);

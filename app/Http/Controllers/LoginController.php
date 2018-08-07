@@ -33,17 +33,15 @@ class LoginController extends Controller
 
             // attempt to do the login
             if (Auth::attempt($userdata)) {
-        
                 // validation successful!
                 // redirect them to the secure section or whatever
                 // return Redirect::to('secure');
                 // for now we'll just echo success (even though echoing in a controller is bad)
-                return redirect('dashboard');
+                return redirect('/dashboard');
         
             } else {        
-        
                 // validation not successful, send back to form 
-                return redirect('login')->with('status', 'Oops! User does not exist!');
+                return redirect('/login')->with('status', 'Oops! User does not exist!');
         
             }
         }

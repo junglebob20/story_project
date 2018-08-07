@@ -27,48 +27,62 @@
 </div>
 @if (count($items)>0)
 <div class="content-imagedata">
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col" class="table-col">@sortablelink('id')</th>
-                <th scope="col" class="table-col">Image</th>
-                <th scope="col" class="table-col">@sortablelink('name')</th>
-                <th scope="col" class="table-col">Tags</th>
-                <th scope="col" class="table-col">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($items as $k=>$item)
-            <tr>
-                <th scope="row">{{$item->id}}</th>
-                <td>
-                    <img data-toggle="modal" data-target="#modal-open-img" class="img-item" src="{{ asset($item->path.'/'.$item->name.'.'.$item->ext) }}" alt="{{ $item->name }}">
-                </td>
-                <td>{{ $item->name }}</td>
-                <td>
-                    <div class="tags-wrapper">
-                        @foreach($item->tags as $k=>$tag)
-                            <div class="tag-wrap">
-                                <span id="unclickable-label" class="aui-label">{{$tag->name}}</span>
-                            </div>
-                        @endforeach
+    <div class="table-data col-9">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col" class="table-col">@sortablelink('id')</th>
+                    <th scope="col" class="table-col">Image</th>
+                    <th scope="col" class="table-col">@sortablelink('name')</th>
+                    <th scope="col" class="table-col">Tags</th>
+                    <th scope="col" class="table-col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($items as $k=>$item)
+                <tr>
+                    <th scope="row">{{$item->id}}</th>
+                    <td>
+                        <img data-toggle="modal" data-target="#modal-open-img" class="img-item" src="{{ asset($item->path.'/'.$item->name.'.'.$item->ext) }}" alt="{{ $item->name }}">
+                    </td>
+                    <td>{{ $item->name }}</td>
+                    <td>
+                        <div class="tags-wrapper">
+                            @foreach($item->tags as $k=>$tag)
+                                <div class="tag-wrap">
+                                    <span id="unclickable-label" class="aui-label">{{$tag->name}}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    </td>
+                    <td class="col-action">
+                        <div class="support-btns">
+                            <button type="button" class="btn btn-primary tag-edit" data-id="{{$item->id}}">
+                                <i class="fa fa-pencil" aria-hidden="true"></i>Edit</button>
+                            <button type="button" class="btn btn-primary tag-delete" data-id="{{$item->id}}">
+                                <i class="fa fa-trash" aria-hidden="true"></i>Delete</button>
+                            <button type="button" class="btn btn-primary image-download" data-id="{{$item->id}}">
+                                    <a href="{{asset('storage/imagesSource'.'/'.$item->name.'.'.$item->ext)}}" download></a>
+                                <i class="fa fa-download" aria-hidden="true"></i>Download</button>
+                        </div>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+    <div class="right-column col-3">
+        <div class="tags-list">
+            <div class="tags-list-header">Tags Cloud</div>
+            <div class="tags-wrapper">
+                @foreach($tags as $k=>$tag)
+                    <div class="tag-wrap">
+                    <a class="aui-label" href="{{$request->fullUrlWithQuery(['tag_name' => $tag->name])}}">{{$tag->name}}</a>
                     </div>
-                </td>
-                <td class="col-action">
-                    <div class="support-btns">
-                        <button type="button" class="btn btn-primary tag-edit" data-id="{{$item->id}}">
-                            <i class="fa fa-pencil" aria-hidden="true"></i>Edit</button>
-                        <button type="button" class="btn btn-primary tag-delete" data-id="{{$item->id}}">
-                            <i class="fa fa-trash" aria-hidden="true"></i>Delete</button>
-                        <button type="button" class="btn btn-primary image-download" data-id="{{$item->id}}">
-                                <a href="{{asset('storage/imagesSource'.'/'.$item->name.'.'.$item->ext)}}" download></a>
-                            <i class="fa fa-download" aria-hidden="true"></i>Download</button>
-                    </div>
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+                @endforeach
+            </div>
+        </div>
+    </div>
 </div>
 <div class="support-modal-wrapper">
     <div class="modal" id="modal-open-img" tabindex="-1" role="dialog">
@@ -84,6 +98,13 @@
 @endif
 <script>
     $(document).ready(function () {
+        $('#search_input_btn').click(function(e){
+            
+            if(!$('#search_form > div > input').val()){
+                $('#search_form').submit();
+            }
+            e.preventDefault();
+        });
         $("#add_tags_select").on("select2:open", function (event) {
             $('input.select2-search__field').attr('placeholder', 'Add New Tag');
         });
@@ -154,13 +175,13 @@
             $('#modal-open-img').find('.modal-dialog').attr('style', 'max-width: 542px;margin: 0;');
             $('#modal-open-img').find('img').attr('style', 'width: 100%;height: 100%;');
         });
-        $(".content-imagedata").scroll(function () {
-            var position = $('.content-imagedata').scrollTop();
-            var bottom = $('.content-imagedata').outerHeight();
-            var scrollHeight = $(".content-imagedata")[0].scrollHeight;
+        $(".table-data").scroll(function () {
+            var position = $('.table-data').scrollTop();
+            var bottom = $('.table-data').outerHeight();
+            var scrollHeight = $(".table-data")[0].scrollHeight;
             if (position + bottom == scrollHeight) {
-                var offset = $('.content-imagedata > table > tbody > tr').length;
-                $(".content-imagedata").addClass('lazy-loading');
+                var offset = $('.table-data > table > tbody > tr').length;
+                $(".table-data").addClass('lazy-loading');
                 $.ajax({
                     url: "images_loading",
                     type: 'post',
@@ -176,9 +197,9 @@
                         _token: '{{ csrf_token() }}'
                     },
                     success: function (data) {
-                        $('div.content-imagedata > table > tbody').append(data).show().fadeIn("slow");
+                        $('div.table-data > table > tbody').append(data).show().fadeIn("slow");
 
-                        $(".content-imagedata").removeClass('lazy-loading');
+                        $(".table-data").removeClass('lazy-loading');
                     },
                     error: function () {
                         console.log("Error");

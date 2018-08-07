@@ -15,7 +15,7 @@ class User
      */
     public function handle($request, Closure $next)
     {
-        if(Auth::user()){
+        if(Auth::user() &&  Auth::user()->role == 'user'){
             return $next($request);
         }
         return redirect('/login');

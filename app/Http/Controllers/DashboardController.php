@@ -4,8 +4,26 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Image;
+use App\Tag;
+use App\User;
+use App\Repositories\Repository;
 class DashboardController extends Controller
 {
+    protected $images;
+    protected $tags;
+    protected $users;
+    /**
+    * Construct new controller.
+    *
+    * @return void
+    */
+    public function __construct(Image $images, Tag $tags, User $users)
+    {
+        $this->tags = new Repository($tags);
+        $this->images = new Repository($images);
+        $this->users = new Repository($users);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -13,10 +31,12 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        if(Auth::check()){
-            return view('pages.dashboard');
-        }
-        return redirect('login');
+        $countsInfo=array(
+            'imagesCount'=>$this->images->all()->count(),
+            'tagsCount'=>$this->tags->all()->count(),
+            'usersCount'=>$this->users->all()->count()
+        );
+        return view('pages.dashboard', compact('countsInfo'));
     }
 
     /**

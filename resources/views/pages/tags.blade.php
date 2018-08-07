@@ -62,6 +62,14 @@
 @endif
 <script>
     $(document).ready(function () {
+        $('#search_input_btn').click(function(e){
+            console.log(!$('#search_form > div > input').val());
+            if(!$('#search_form > div > input').val()){
+                $('#search_form').submit();
+            }else{
+                e.preventDefault();
+            }
+        });
         $('.content-imagedata').on('click', '.tag-edit', function (e) {
             var btn = $(this);
             $.ajax({

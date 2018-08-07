@@ -67,6 +67,13 @@
 @endif
 <script>
   $(document).ready(function () {
+    $('#search_input_btn').click(function(e){
+            console.log(!$('#search_form > div > input').val());
+            if(!$('#search_form > div > input').val()){
+                $('#search_form').submit();
+            }
+            e.preventDefault();
+        });
     $('.content-imagedata').on('click', '.user-edit', function (e) {
           var btn = $(this);
           var urlAjax = "user/" + btn.data('id') + "/edit";
