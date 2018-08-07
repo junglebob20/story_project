@@ -1,32 +1,34 @@
-@extends('layouts.dashboard_default') @section('content')
-<div class="content-addimage">
-  @if (session('success'))
-  <div class="image-status" style="color:green;">
-    <i class="fa fa-check-circle" aria-hidden="true"></i>
-    {{session('success')}}
-  </div>
-  @elseif (session('fail'))
-  <div class="image-status" style="color:red;">
-    <i class="fa fa-check-circle" aria-hidden="true"></i>
-    {{session('fail')}}
-  </div>
-  @else
-  <div class="image-status">
+@extends('layouts.dashboard_default') 
+@section('content')
 
-  </div>
-  @endif
-  <button type="button" id="modal-open-add-user-btn" class="btn btn-dark">
-    <i class="fa fa-plus-circle" aria-hidden="true"></i>Add new user</button>
+@if (session('success'))
+<div class="alert alert-success" role="alert">
+    <strong>
+        <i class="fa fa-check-circle" aria-hidden="true"></i>
+    </strong> {{session('success')}}
 </div>
-<div class="content-search">
-  <form id="search_form" action="{{url('userslist')}}" method="GET">
-    <div class="input-group">
-        <input type="text" class="form-control" placeholder="Search" name="q" aria-label="Search" aria-describedby="basic-addon2" value="{{$query or ''}}">
-        <div id="search_input_btn" class="input-group-append">
-            <span class="input-group-text" id="basic-addon2">Search</span>
-        </div>
-    </div> 
-  </form>
+@elseif (session('fail'))
+<div class="alert alert-warning" role="alert">
+    <strong>
+        <i class="fa fa-check-circle" aria-hidden="true"></i>
+    </strong> {{session('fail')}}
+</div>
+@endif
+
+<div class="content-addimage">
+    <div class="search-container">
+        <form id="search_form" action="{{url('userslist')}}" method="GET">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search" name="q" aria-label="Search" aria-describedby="basic-addon2"
+                    value="{{$query or ''}}">
+                <div id="search_input_btn" class="input-group-append">
+                    <span class="input-group-text" id="basic-addon2">Search</span>
+                </div>
+            </div>
+        </form>
+    </div>
+    <button type="button" id="modal-open-add-user-btn" class="btn btn-dark">
+        <i class="fa fa-plus-circle" aria-hidden="true"></i>Add new user</button>
 </div>
 @if (count($items)>0)
 <div class="content-imagedata">

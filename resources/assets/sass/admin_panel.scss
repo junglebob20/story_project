@@ -440,6 +440,64 @@
             border: 1px solid rgba(0, 0, 0, 0.15);
             border-radius: .25rem;
             /*grid-area: addimage;*/
+            .search-container{
+              width: 100%;
+              margin-right: 15px;
+              form{
+                .input-group{
+                  .input-group-append{
+                    margin-left: -1px;
+                    cursor: pointer;
+                    &:hover,&:active{
+                      .input-group-text{
+                        color: #000;
+                        background-color: #fff;
+                        border-color: #343a40;
+                      }
+                    }
+                    &:focus{
+                      .input-group-text{
+                        box-shadow: 0 0 0 0.2rem rgba(52,58,64,.5);
+                      }
+                    }
+                    .input-group-text{
+                      display: flex;
+                      align-items: center;
+                      padding: .375rem .75rem;
+                      margin-bottom: 0;
+                      font-size: 1rem;
+                      font-weight: 400;
+                      line-height: 1.5;
+                      color: #495057;
+                      text-align: center;
+                      white-space: nowrap;
+                      background-color: #e9ecef;
+                      border: 1px solid #ced4da;
+                      background: #1d1d1d;
+                      color: #fff;
+                      border-color: transparent;
+                      border-radius: 0 .25rem .25rem 0;
+                    }
+                  }
+                }
+                .form-group{
+                  display: flex;
+                  flex-direction: row;
+                  justify-content: center;
+                  align-items: center;
+                  margin: 0;
+                  label{
+                    margin: 0;
+                    margin-right: 15px;
+                    color: #000;
+                    font-size: 18px;
+                  }
+                  .form-control{
+    
+                  }
+                }
+              }
+            }
             .image-status{
               display: flex;
               font-size: 18px;

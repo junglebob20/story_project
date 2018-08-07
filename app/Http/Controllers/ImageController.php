@@ -40,13 +40,8 @@ class ImageController extends Controller
             });
         }
         if($request->sort && $request->order){
-            if($request->sort=='tags'){
-                $this->query->whereHas('tags')->orderBy('name',$request->order)->limit(10);
-                $sortColumn=[$request->sort,$request->order];
-            }else{
-                $this->query->orderBy($request->sort,$request->order)->limit(10);
-                $sortColumn=[$request->sort,$request->order];
-            }
+            $this->query->orderBy($request->sort,$request->order)->limit(10);
+            $sortColumn=[$request->sort,$request->order];
         }else{
             $sortColumn=['created_at','desc'];
             $this->query->orderBy($sortColumn[0],$sortColumn[1])->limit(10);
@@ -96,8 +91,10 @@ class ImageController extends Controller
                 $image = $request->file('image');
                 $input['imageName'] = time();
                 $input['imageExt'] = $image->getClientOriginalExtension();
+                $destinationPathSource = public_path('storage/imagesSource');
                 $destinationPath = public_path('storage/images');
                 $img = ImageManager::make($image->getRealPath());
+                $img->save($destinationPathSource.'/'.$input['imageName'].'.'.$input['imageExt']);
                 if(!$this->check_imageSize($image)){
                     $img->resize(512, 512);
                 }
@@ -139,7 +136,7 @@ class ImageController extends Controller
     protected function getValidator(Request $request)
     {
         $rules = [
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg',
+            'image' => 'required|image',
             'tags' => 'required'
         ];
 
@@ -170,7 +167,7 @@ class ImageController extends Controller
     protected function getValidatorImage(Request $request)
     {
         $rules = [
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg'
+            'image' => 'required|image'
         ];
 
         return Validator::make($request->all(), $rules);
@@ -250,8 +247,10 @@ class ImageController extends Controller
                 $image = $request->file('image');
                 $input['imageName'] = time();
                 $input['imageExt'] = $image->getClientOriginalExtension();
+                $destinationPathSource = public_path('storage/imagesSource');
                 $destinationPath = public_path('storage/images');
                 $img = ImageManager::make($image->getRealPath());
+                $img->save($destinationPathSource.'/'.$input['imageName'].'.'.$input['imageExt']);
                 if(!$this->check_imageSize($image)){
                     $img->resize(512, 512);
                 }
@@ -282,6 +281,7 @@ class ImageController extends Controller
     protected function deleteImageFromStorage($id){
         $currentImage=$this->images->show($id);
         Storage::disk('public')->delete('images/'.$currentImage->name.'.'.$currentImage->ext);
+        Storage::disk('public')->delete('imagesSource/'.$currentImage->name.'.'.$currentImage->ext);
     }
     /**
      * Remove the specified resource from storage.
@@ -292,6 +292,7 @@ class ImageController extends Controller
     public function destroy(Request $request)
     {   
         $this->images->show($request->id)->tags()->detach();
+        $this->deleteImageFromStorage($request->id);
         if($this->images->delete($request->id)){
             return back()->with('success','Image Deleted successful');
         }else{
