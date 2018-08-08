@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-//use App\Repositories\TagRepository;
 use App\Repositories\Repository;
 use \Validator;
 use App\Tag;
@@ -67,7 +66,8 @@ class TagController extends Controller
             return back()->with('fail','Tag Adding failed');
         }else{
             $this->tags->create([
-                'name' => $request->name
+                'name' => $request->name,
+                'published' =>'1'
             ]);
         
             return back()->with('success','Tag Added successful');

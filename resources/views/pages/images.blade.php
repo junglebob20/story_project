@@ -73,11 +73,11 @@
     </div>
     <div class="right-column col-3">
         <div class="tags-list">
-            <div class="tags-list-header">Tags Cloud</div>
+            <div class="tags-list-header">Tags Filters</div>
             <div class="tags-wrapper">
                 @foreach($tags as $k=>$tag)
                     <div class="tag-wrap">
-                    <a class="aui-label" href="{{$request->fullUrlWithQuery(['tag_name' => $tag->name])}}">{{$tag->name}}</a>
+                        <a class="aui-label {{isActiveTag($request,$tag->name)}}" href="{{$request->fullUrlWithQuery(['tag_name' => $tag->name])}}">{{$tag->name}}</a>
                     </div>
                 @endforeach
             </div>

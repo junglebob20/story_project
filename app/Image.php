@@ -12,7 +12,7 @@ class Image extends Model
     * @var array
     */
     protected $fillable = [
-        'name','path','ext'
+        'name','path','ext','published'
     ];
     public function tags()
     {

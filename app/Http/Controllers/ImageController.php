@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-//use App\Repositories\ImageRepository;
 use App\Repositories\Repository;
 use Intervention\Image\ImageManagerStatic as ImageManager;
 use \Validator;
@@ -106,19 +105,26 @@ class ImageController extends Controller
                 $image = $request->file('image');
                 $input['imageName'] = time();
                 $input['imageExt'] = $image->getClientOriginalExtension();
-                $destinationPathSource = public_path('storage/imagesSource');
-                $destinationPath = public_path('storage/images');
+                $s3 = Storage::disk('s3');
+
+                //upload imageSource
+                $filePathSource = '/imagesSource/' . $input['imageName'].'.'.$input['imageExt'];
+                $s3->put($filePathSource, file_get_contents($image), 'public');
+
+                //upload imageResize
+                $filePath = '/images/' . $input['imageName'].'.'.$input['imageExt'];
                 $img = ImageManager::make($image->getRealPath());
-                $img->save($destinationPathSource.'/'.$input['imageName'].'.'.$input['imageExt']);
                 if(!$this->check_imageSize($image)){
                     $img->resize(512, 512);
                 }
-                $img->save($destinationPath.'/'.$input['imageName'].'.'.$input['imageExt']);
+                $s3->put($filePath, file_get_contents($img), 'public');
+
     
                 $newImage=$this->images->create([
                     'name' => $input['imageName'],
-                    'path'=> 'storage/images/',
-                    'ext'=> $input['imageExt']
+                    'path'=> '/images/',
+                    'ext'=> $input['imageExt'],
+                    'published' => '1'
                 ]);
 
                 $tags=$request->input('tags');
@@ -262,18 +268,25 @@ class ImageController extends Controller
                 $image = $request->file('image');
                 $input['imageName'] = time();
                 $input['imageExt'] = $image->getClientOriginalExtension();
-                $destinationPathSource = public_path('storage/imagesSource');
-                $destinationPath = public_path('storage/images');
-                $img = ImageManager::make($image->getRealPath());
-                $img->save($destinationPathSource.'/'.$input['imageName'].'.'.$input['imageExt']);
+                $s3 = Storage::disk('s3');
+
+                //upload imageSource
+                $imgSource=ImageManager::make($image->getRealPath())->stream();
+                $filePathSource = '/imagesSource/' . $input['imageName'].'.'.$input['imageExt'];
+                $s3->put($filePathSource, $imgSource, 'public');
+
+                //upload imageResize
+                $filePath = '/images/' . $input['imageName'].'.'.$input['imageExt'];
+                $imgResize = ImageManager::make($image->getRealPath());
                 if(!$this->check_imageSize($image)){
-                    $img->resize(512, 512);
+                    $imgResize->resize(512, 512);
                 }
-                $img->save($destinationPath.'/'.$input['imageName'].'.'.$input['imageExt']);
+                $s3->put($filePath, $imgResize->stream(), 'public');
+
 
                 $this->images->update([
                     'name' => $input['imageName'],
-                    'path'=> 'storage/images/',
+                    'path'=> '/images/',
                     'ext'=> $input['imageExt']
                 ],$request->id);
 
@@ -295,8 +308,8 @@ class ImageController extends Controller
     }
     protected function deleteImageFromStorage($id){
         $currentImage=$this->images->show($id);
-        Storage::disk('public')->delete('images/'.$currentImage->name.'.'.$currentImage->ext);
-        Storage::disk('public')->delete('imagesSource/'.$currentImage->name.'.'.$currentImage->ext);
+        Storage::disk('s3')->delete('images/'.$currentImage->name.'.'.$currentImage->ext);
+        Storage::disk('s3')->delete('imagesSource/'.$currentImage->name.'.'.$currentImage->ext);
     }
     /**
      * Remove the specified resource from storage.

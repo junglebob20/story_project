@@ -9,7 +9,8 @@ class TagTableSeeder extends Seeder{
     {
         DB::table('tags')->delete();
         Tag::create(array(
-            'name' => 'tag_1'
+            'name' => 'tag_1',
+            'published' => '1'
         ));
     }
 

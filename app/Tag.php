@@ -14,7 +14,7 @@ class Tag extends Model
      * @var array
      */
     protected $fillable = [
-        'name'
+        'name','published'
     ];
     public function images()
     {

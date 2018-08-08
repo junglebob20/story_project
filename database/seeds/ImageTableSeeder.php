@@ -11,7 +11,8 @@ class ImageTableSeeder extends Seeder{
         Image::create(array(
             'name' => 'test',
             'path' => 'storage/images',
-            'ext' => 'png'
+            'ext' => 'png',
+            'published' => '1'
         ));
     }
 
