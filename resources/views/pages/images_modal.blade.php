@@ -101,7 +101,7 @@
                     <div class="form-group">
                         <div class="img-uploader" id="img-uploader-edit">
                             <div class="uploaded-image">
-                                <img src="{{ asset($item->path.'/'.$item->name.'.'.$item->ext) }}" alt="{{$item->name}}">
+                                <img src="{{ 'https://dv54eeblzy5zp.cloudfront.net/'.$item->path.$item->name.'.'.$item->ext }}" alt="{{$item->name}}">
                                 <div class="uploaded-image-delete"><i class="fa fa-trash" aria-hidden="true"></i></div>
                             </div>
                         </div>

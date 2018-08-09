@@ -6,7 +6,7 @@
     <strong><i class="fa fa-check-circle" aria-hidden="true"></i></strong> {{session('success')}}
   </div>
   @elseif (session('fail'))
-  <div class="alert alert-warning" role="alert">
+  <div class="alert alert-danger" role="alert">
     <strong><i class="fa fa-check-circle" aria-hidden="true"></i></strong> {{session('fail')}}
   </div>
   @endif
@@ -49,8 +49,10 @@
                     <div class="support-btns">
                         <button type="button" data-id="{{$item->id}}" data-toggle="modal" class="btn btn-primary tag-edit">
                             <i class="fa fa-pencil" aria-hidden="true"></i>Edit</button>
+                        @if(Auth::user()->role=='admin' || Auth::user()->role=='root')
                         <button type="button" data-id="{{$item->id}}" class="btn btn-primary tag-delete">
                             <i class="fa fa-trash" aria-hidden="true"></i>Delete</button>
+                        @endif
                     </div>
                 </td>
             </tr>

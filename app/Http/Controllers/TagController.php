@@ -83,7 +83,7 @@ class TagController extends Controller
     protected function getValidator(Request $request)
     {
         $rules = [
-            'name' => 'required|max:255|unique:tags'
+            'name' => 'required|max:255|unique:tags,name'
         ];
 
         return Validator::make($request->all(), $rules);
@@ -133,11 +133,16 @@ class TagController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if($request->has('name')){
-            $this->tags->update(['name' => $request->name],$id);
-            return back()->with('success','Tag Edited successful');
+        $validator = $this->getValidator($request);
+        if ($validator->fails()) {
+            return back()->with('fail','Tag Edited failed');
         }else{
-            return back()->with('fail','Tag Edding failed');
+            if($request->has('name')){
+                $this->tags->update(['name' => $request->name],$id);
+                return back()->with('success','Tag Edited successful');
+            }else{
+                return back()->with('fail','Tag Edited failed');
+            }
         }
     }
 

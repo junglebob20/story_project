@@ -8,7 +8,7 @@
     </strong> {{session('success')}}
 </div>
 @elseif (session('fail'))
-<div class="alert alert-warning" role="alert">
+<div class="alert alert-danger" role="alert">
     <strong>
         <i class="fa fa-check-circle" aria-hidden="true"></i>
     </strong> {{session('fail')}}

@@ -92,7 +92,7 @@ class UserController extends Controller
     protected function getValidator(Request $request)
     {
         $rules = [
-            'username' => 'required|max:255|unique:users',
+            'username' => 'required|max:255|unique:users,username,'.$request->id,
             'password' => 'required|required_with:password_confirmation|same:password_confirmation|min:1',
             'password_confirmation' => 'required|min:1',
             'role' => 'required|min:1',

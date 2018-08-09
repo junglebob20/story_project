@@ -6,7 +6,7 @@
     <strong><i class="fa fa-check-circle" aria-hidden="true"></i></strong> {{session('success')}}
   </div>
   @elseif (session('fail'))
-  <div class="alert alert-warning" role="alert">
+  <div class="alert alert-danger" role="alert">
     <strong><i class="fa fa-check-circle" aria-hidden="true"></i></strong> {{session('fail')}}
   </div>
   @endif
@@ -43,7 +43,7 @@
                 <tr>
                     <th scope="row">{{$item->id}}</th>
                     <td>
-                        <img data-toggle="modal" data-target="#modal-open-img" class="img-item" src="{{ asset($item->path.'/'.$item->name.'.'.$item->ext) }}" alt="{{ $item->name }}">
+                    <img data-toggle="modal" data-target="#modal-open-img" class="img-item" src="{{ 'https://dv54eeblzy5zp.cloudfront.net/'.$item->path.$item->name.'.'.$item->ext }}" alt="{{ $item->name }}">
                     </td>
                     <td>{{ $item->name }}</td>
                     <td>
@@ -59,10 +59,12 @@
                         <div class="support-btns">
                             <button type="button" class="btn btn-primary tag-edit" data-id="{{$item->id}}">
                                 <i class="fa fa-pencil" aria-hidden="true"></i>Edit</button>
+                            @if(Auth::user()->role=='admin' || Auth::user()->role=='root')
                             <button type="button" class="btn btn-primary tag-delete" data-id="{{$item->id}}">
                                 <i class="fa fa-trash" aria-hidden="true"></i>Delete</button>
+                            @endif
                             <button type="button" class="btn btn-primary image-download" data-id="{{$item->id}}">
-                                    <a href="{{asset('storage/imagesSource'.'/'.$item->name.'.'.$item->ext)}}" download></a>
+                            <a href="{{ 'https://dv54eeblzy5zp.cloudfront.net/'.'imagessource/'.$item->name.'.'.$item->ext }}" target="_blank" download="{{$item->name}}"></a>
                                 <i class="fa fa-download" aria-hidden="true"></i>Download</button>
                         </div>
                     </td>

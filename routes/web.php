@@ -38,7 +38,7 @@ Route::post('image/add', 'ImageController@store')->middleware('auth');
 Route::get('image/{id}/edit', 'ImageController@edit')->middleware('auth');
 Route::post('image/update', 'ImageController@update')->middleware('auth');
 
-Route::get('image/{id}/delete', 'ImageController@delete')->middleware('auth');
+Route::get('image/{id}/delete', 'ImageController@delete')->middleware('auth','admin');
 Route::post('image/destroy', 'ImageController@destroy')->middleware('auth');
 
 Route::post('images_loading', 'ImageController@lazyLoading')->middleware('auth');
@@ -58,7 +58,7 @@ Route::get('tag_edit_form/{id}', 'TagController@edit')->middleware('auth');
 
 Route::post('tags_edit/{id}', 'TagController@update')->middleware('auth');
 
-Route::post('tags_delete/{id}', 'TagController@destroy')->middleware('auth');
+Route::post('tags_delete/{id}', 'TagController@destroy')->middleware('auth','admin');
 
 Route::get('tags_search', 'TagController@search')->middleware('auth');
 Route::post('tags_loading', 'TagController@lazyLoading')->middleware('auth');

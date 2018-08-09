@@ -11,6 +11,7 @@ use App\Image;
 use App\Tag;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use League\Flysystem\Filesystem;
 class ImageController extends Controller
 {
     protected $images;
@@ -73,9 +74,8 @@ class ImageController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function test(){
-        $toReturn=$this->tags->getModel()->join('image_tags', 'image_tags.tag_id', '=', 'tags.id')->groupBy('tags.id')->select('tags.id','tags.name',DB::raw('count(tags.id) as tag_count'))
-        ->orderBy('tag_count','desc')->get();
-        return $toReturn;
+        $s3 = Storage::disk('s3')->url('images/1533742434.jpg');
+        return $s3;
     }
     /**
      * Show the form for creating a new resource.
@@ -108,21 +108,21 @@ class ImageController extends Controller
                 $s3 = Storage::disk('s3');
 
                 //upload imageSource
-                $filePathSource = '/imagesSource/' . $input['imageName'].'.'.$input['imageExt'];
-                $s3->put($filePathSource, file_get_contents($image), 'public');
-
+                $filePathSource = '/imagessource/' . $input['imageName'].'.'.$input['imageExt'];
+                $s3->put($filePathSource, file_get_contents($image));
+                
                 //upload imageResize
                 $filePath = '/images/' . $input['imageName'].'.'.$input['imageExt'];
                 $img = ImageManager::make($image->getRealPath());
                 if(!$this->check_imageSize($image)){
                     $img->resize(512, 512);
                 }
-                $s3->put($filePath, file_get_contents($img), 'public');
-
-    
+                $s3->put($filePath, (string)$img->stream());
+                
+                
                 $newImage=$this->images->create([
                     'name' => $input['imageName'],
-                    'path'=> '/images/',
+                    'path'=> 'images/',
                     'ext'=> $input['imageExt'],
                     'published' => '1'
                 ]);
@@ -271,9 +271,9 @@ class ImageController extends Controller
                 $s3 = Storage::disk('s3');
 
                 //upload imageSource
-                $imgSource=ImageManager::make($image->getRealPath())->stream();
-                $filePathSource = '/imagesSource/' . $input['imageName'].'.'.$input['imageExt'];
-                $s3->put($filePathSource, $imgSource, 'public');
+                $imgSource=ImageManager::make($image->getRealPath());
+                $filePathSource = '/imagessource/' . $input['imageName'].'.'.$input['imageExt'];
+                $s3->put($filePathSource, (string)$imgSource->stream());
 
                 //upload imageResize
                 $filePath = '/images/' . $input['imageName'].'.'.$input['imageExt'];
@@ -281,12 +281,12 @@ class ImageController extends Controller
                 if(!$this->check_imageSize($image)){
                     $imgResize->resize(512, 512);
                 }
-                $s3->put($filePath, $imgResize->stream(), 'public');
+                $s3->put($filePath, (string)$imgResize->stream());
 
 
                 $this->images->update([
                     'name' => $input['imageName'],
-                    'path'=> '/images/',
+                    'path'=> 'images/',
                     'ext'=> $input['imageExt']
                 ],$request->id);
 
@@ -309,7 +309,7 @@ class ImageController extends Controller
     protected function deleteImageFromStorage($id){
         $currentImage=$this->images->show($id);
         Storage::disk('s3')->delete('images/'.$currentImage->name.'.'.$currentImage->ext);
-        Storage::disk('s3')->delete('imagesSource/'.$currentImage->name.'.'.$currentImage->ext);
+        Storage::disk('s3')->delete('imagessource/'.$currentImage->name.'.'.$currentImage->ext);
     }
     /**
      * Remove the specified resource from storage.
